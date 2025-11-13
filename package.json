@@ -2,6 +2,7 @@
   "name": "ember-source-lens",
   "version": "0.0.0",
   "description": "The default blueprint for Embroider v2 addons.",
+  "packageManager": "pnpm@10.20.0",
   "keywords": [
     "ember-addon"
   ],
