@@ -62,8 +62,8 @@ describe('Adds data attributes to tags', () => {
 
     expect(templateContentsOf(output)).toMatchInlineSnapshot(`
     [
-      "<div data-source-file="/src/components/example-component.gjs" data-source-line="2" class="foo">
-        <h1 data-source-file="/src/components/example-component.gjs" data-source-line="3">Hello, World!</h1>
+      "<div data-source-file="/src/components/example-component.gjs" class="foo">
+        <h1 data-source-file="/src/components/example-component.gjs">Hello, World!</h1>
     </div>",
     ]
   `);
@@ -84,8 +84,8 @@ describe('Adds data attributes to tags', () => {
 
     expect(templateContentsOf(output)).toMatchInlineSnapshot(`
     [
-      "<section data-source-file="/src/components/example-component.gjs" data-source-line="6" class="bar">
-        <p data-source-file="/src/components/example-component.gjs" data-source-line="7">Welcome to Ember!</p>
+      "<section data-source-file="/src/components/example-component.gjs" class="bar">
+      <p data-source-file="/src/components/example-component.gjs">Welcome to Ember!</p>
     </section>",
     ]
   `);
@@ -108,11 +108,11 @@ describe('Adds data attributes to tags', () => {
 
     expect(templateContentsOf(output)).toMatchInlineSnapshot(`
     [
-      "<div data-source-file="/src/components/example-component.gjs" data-source-line="2" class="foo">
-        <h1 data-source-file="/src/components/example-component.gjs" data-source-line="3">Hello, World!</h1>
+      "<div data-source-file="/src/components/example-component.gjs" class="foo">
+        <h1 data-source-file="/src/components/example-component.gjs">Hello, World!</h1>
     </div>",
-      "<section data-source-file="/src/components/example-component.gjs" data-source-line="8" class="bar">
-        <p data-source-file="/src/components/example-component.gjs" data-source-line="9">Welcome to Ember!</p>
+      "<section data-source-file="/src/components/example-component.gjs" class="bar">
+      <p data-source-file="/src/components/example-component.gjs">Welcome to Ember!</p>
     </section>",
     ]
   `);
