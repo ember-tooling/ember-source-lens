@@ -31,6 +31,7 @@ const programNodesForFile = new Map<string, AST.Program[]>();
 
 export function templatePlugin(env: { filename: string }) {
   const file = getFullFileContent(env.filename);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
   const t = new Transformer(file);
 
   const relativePath = fixFilename(env.filename);
@@ -54,12 +55,15 @@ export function templatePlugin(env: { filename: string }) {
 
       const programNodes = programNodesForFile.get(env.filename) || [];
 
-      programNodes.forEach((programNode, index) => {
+      programNodes.some((programNode, index) => {
         const elementNodes = getAllElementNodes(programNode);
 
         if (elementNodes.includes(node)) {
           programNodeIndex = index;
+          return true;
         }
+
+        return false;
       });
 
       node.attributes.push(
@@ -70,11 +74,15 @@ export function templatePlugin(env: { filename: string }) {
         recast.builders.attr(
           'data-source-line',
           recast.builders.text(
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call
             t
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
               .reverseInnerCoordinatesOf(
-                t.parseResults[programNodeIndex]!,
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                t.parseResults[programNodeIndex],
                 innerCoordinates,
               )
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
               .line.toString(),
           ),
         ),

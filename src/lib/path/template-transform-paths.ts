@@ -1,6 +1,3 @@
-import path from 'node:path';
-
-import { leadingSlashPath } from './const.ts';
 import { findWorkspacePath } from './utils.ts';
 
 /**
@@ -16,56 +13,5 @@ export function fixFilename(filename: string): string {
   const fileName = filename;
   const workspace = findWorkspacePath(fileName);
 
-  return fileName.replace(workspace, '');
-
-  console.log(`fixFilename: workspace=${workspace}, fileName=${fileName}`);
-
-  /**
-   * ember-source 5.8:
-   * - the filename looks like an absolute path, but swapped out the 'app' part of the path
-   *   with the module name, so the file paths never exist on disk
-   *
-   * - in vite apps:
-   *   the 'app' part _may_ be `src`, so we also need to ensure that `src` is excluded as well
-   */
-  const hasAppDir = fileName.includes(path.join(workspace, 'app'));
-  const hasSrcDir = fileName.includes(path.join(workspace, 'src'));
-
-  if (
-    !(hasAppDir || hasSrcDir) &&
-    !fileName.includes(leadingSlashPath.embroiderDir)
-  ) {
-    const maybeModule = fileName.replace(workspace, '');
-    const [maybeScope, ...rest] = maybeModule.split(path.sep).filter(Boolean);
-    let parts = rest;
-
-    if (maybeScope?.startsWith('@')) {
-      const [, ...rester] = rest;
-
-      parts = rester;
-    }
-
-    const relative = path.join(...parts);
-
-    /**
-     * We don't actually know if this file is an app.
-     * it could be an addon (v1 or v2)
-     *
-     * So here we log to see if we have unhandled situations.
-     */
-    // const candidatePath = path.join('app', relative);
-    const candidatePath = path.join(workspace, relative);
-
-    return candidatePath;
-  }
-
-  // TODO: why are we passed files to other projects?
-  if (!fileName.includes(workspace)) {
-    return fileName;
-  }
-
-  // Fallback to what the plugin system gives us.
-  // This may be wrong, and if wrong, reveals
-  // unhandled scenarios with the file names in the plugin infra
   return fileName.replace(workspace, '');
 }

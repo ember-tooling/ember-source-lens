@@ -64,8 +64,8 @@ describe('Adds data attributes to tags', () => {
 
     expect(templateContentsOf(output)).toMatchInlineSnapshot(`
     [
-      "<div data-source-file="/tests/fixtures/toc.gjs" data-source-line="3" class="foo">
-      <h1 data-source-file="/tests/fixtures/toc.gjs" data-source-line="4">Hello, World!</h1>
+      "<div data-source-file="/tests/fixtures/toc.gjs" data-source-line="2" class="foo">
+      <h1 data-source-file="/tests/fixtures/toc.gjs" data-source-line="3">Hello, World!</h1>
     </div>",
     ]
   `);
