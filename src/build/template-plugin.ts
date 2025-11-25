@@ -1,6 +1,5 @@
 import process from 'node:process';
-import type { ASTPlugin } from '@glimmer/syntax';
-import { fixFilename } from '../lib/path/template-transform-paths.js';
+import type { ASTPluginBuilder } from '@glimmer/syntax';
 import { isRelevantFile } from '../lib/path/utils.js';
 import { templatePlugin } from '../lib/rewriteHbs.js';
 
@@ -8,10 +7,6 @@ const noopPlugin = {
   name: 'ember-source-lens:noop',
   visitor: {},
 };
-
-interface ASTPluginBuilder {
-  (env: { filename: string }): ASTPlugin;
-}
 
 export function createPlugin(
   config: { additionalRoots?: string[] } = {},
@@ -28,9 +23,7 @@ export function createPlugin(
       return noopPlugin;
     }
 
-    const relativePath = fixFilename(env.filename);
-
-    const visitors = templatePlugin({ filename: relativePath });
+    const visitors = templatePlugin(env);
 
     return {
       name: 'ember-source-lens:template-plugin',

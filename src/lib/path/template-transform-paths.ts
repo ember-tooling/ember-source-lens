@@ -16,6 +16,10 @@ export function fixFilename(filename: string): string {
   const fileName = filename;
   const workspace = findWorkspacePath(fileName);
 
+  return fileName.replace(workspace, '');
+
+  console.log(`fixFilename: workspace=${workspace}, fileName=${fileName}`);
+
   /**
    * ember-source 5.8:
    * - the filename looks like an absolute path, but swapped out the 'app' part of the path
@@ -49,7 +53,8 @@ export function fixFilename(filename: string): string {
      *
      * So here we log to see if we have unhandled situations.
      */
-    const candidatePath = path.join('app', relative);
+    // const candidatePath = path.join('app', relative);
+    const candidatePath = path.join(workspace, relative);
 
     return candidatePath;
   }

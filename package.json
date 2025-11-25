@@ -47,6 +47,7 @@
   },
   "dependencies": {
     "@embroider/addon-shim": "^1.8.9",
+    "content-tag-utils": "^0.6.0",
     "decorator-transforms": "^2.2.2",
     "ember-template-recast": "^6.1.5"
   },
