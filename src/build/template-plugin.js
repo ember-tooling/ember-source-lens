@@ -1,22 +1,13 @@
 import process from 'node:process';
-import { isRelevantFile } from '../lib/path/utils.ts';
-import { templatePlugin } from '../lib/rewriteHbs.ts';
+import { isRelevantFile } from '../lib/path/utils.js';
+import { templatePlugin } from '../lib/rewriteHbs.js';
 
 const noopPlugin = {
   name: 'ember-source-lens:noop',
   visitor: {},
 };
 
-interface ASTPluginBuilder {
-  (env: { filename: string }): {
-    name: string;
-    visitor: Record<string, unknown>;
-  };
-}
-
-export function createPlugin(
-  config: { additionalRoots?: string[] } = {},
-): ASTPluginBuilder {
+export function createPlugin(config = {}) {
   return function sourceLens(env) {
     const cwd = process.cwd();
 

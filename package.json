@@ -6,6 +6,7 @@
   "keywords": [
     "ember-addon"
   ],
+  "type": "module",
   "repository": "",
   "license": "MIT",
   "author": "",
@@ -49,6 +50,8 @@
     "@embroider/addon-shim": "^1.8.9",
     "content-tag-utils": "^0.6.0",
     "decorator-transforms": "^2.2.2",
+    "ember-modifier": "^4.2.2",
+    "ember-primitives": "^0.45.1",
     "ember-template-recast": "^6.1.5"
   },
   "devDependencies": {
@@ -102,6 +105,7 @@
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.19.1",
     "vite": "^7.1.9",
+    "vite-css-modules": "^1.11.1",
     "vitest": "^4.0.8"
   },
   "ember": {

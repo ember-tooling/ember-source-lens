@@ -4,3 +4,7 @@
 *
 * This CSS is meant for the demo-app only, and will not be included in the published assets for this library.
 */
+
+h1 {
+  display: inline-block;
+}

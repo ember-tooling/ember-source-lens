@@ -1,46 +1,41 @@
-import recast, { type AST } from 'ember-template-recast';
+import recast from 'ember-template-recast';
 import fs from 'node:fs';
-import { fixFilename } from './path/utils.ts';
+import { fixFilename } from './path/utils.js';
 import { Transformer } from 'content-tag-utils';
 
-let fileCache = new Map<string, string>();
+let fileCache = new Map();
 
-function getFullFileContent(filename: string): string {
+function getFullFileContent(filename) {
   if (fileCache.has(filename)) {
-    return fileCache.get(filename)!;
+    return fileCache.get(filename);
   }
-
   const content = fs.readFileSync(filename, 'utf-8');
   fileCache.set(filename, content);
   return content;
 }
 
-function getAllElementNodes(program: AST.Program): AST.ElementNode[] {
-  const elementNodes: AST.ElementNode[] = [];
-
+function getAllElementNodes(program) {
+  const elementNodes = [];
   recast.traverse(program, {
-    ElementNode(node: AST.ElementNode) {
+    ElementNode(node) {
       elementNodes.push(node);
     },
   });
-
   return elementNodes;
 }
 
-let programNodesForFile = new Map<string, AST.Program[]>();
-let processedElementsForFile = new Map<string, number>(); // Track processed elements per file
+let programNodesForFile = new Map();
+let processedElementsForFile = new Map(); // Track processed elements per file
 
-export function templatePlugin(env: { filename: string }) {
+export function templatePlugin(env) {
   const file = getFullFileContent(env.filename);
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
   const t = new Transformer(file);
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  const expectedProgramCount = t.parseResults.length as number;
+  const expectedProgramCount = t.parseResults.length;
 
   const relativePath = fixFilename(env.filename);
 
   return {
-    Program(node: AST.Program) {
+    Program(node) {
       programNodesForFile.set(env.filename, [
         ...(programNodesForFile.get(env.filename) || []),
         node,
@@ -51,26 +46,21 @@ export function templatePlugin(env: { filename: string }) {
         processedElementsForFile.set(env.filename, 0);
       }
     },
-    ElementNode(node: AST.ElementNode) {
+    ElementNode(node) {
       const innerCoordinates = {
         line: node.loc.startPosition.line,
         column: node.loc.startPosition.column,
         endColumn: node.loc.endPosition.column,
         endLine: node.loc.endPosition.line,
       };
-
       let programNodeIndex = 0;
-
       const programNodes = programNodesForFile.get(env.filename) || [];
-
       programNodes.some((programNode, index) => {
         const elementNodes = getAllElementNodes(programNode);
-
         if (elementNodes.includes(node)) {
           programNodeIndex = index;
           return true;
         }
-
         return false;
       });
 
@@ -82,15 +72,11 @@ export function templatePlugin(env: { filename: string }) {
         recast.builders.attr(
           'data-source-line',
           recast.builders.text(
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call
             t
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
               .reverseInnerCoordinatesOf(
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 t.parseResults[programNodeIndex],
                 innerCoordinates,
               )
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
               .line.toString(),
           ),
         ),
@@ -115,9 +101,9 @@ export function templatePlugin(env: { filename: string }) {
         console.log(
           `[${env.filename}] Processed all ${totalElements} elements in ${expectedProgramCount} programs, clearing cache`,
         );
-        programNodesForFile = new Map<string, AST.Program[]>();
-        processedElementsForFile = new Map<string, number>();
-        fileCache = new Map<string, string>();
+        programNodesForFile = new Map();
+        processedElementsForFile = new Map();
+        fileCache = new Map();
       }
     },
   };

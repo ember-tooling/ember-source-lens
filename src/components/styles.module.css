@@ -1,0 +1,16 @@
+.source-lens {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+}
+
+.source-lens-overlay {
+  position: absolute;
+  pointer-events: none;
+  background-color: rgba(0, 255, 229, 0.2);
+  border: 1px solid rgba(0, 255, 229, 0.8);
+  z-index: 9999;
+  box-sizing: border-box;
+  will-change: top, left, width, height;
+  border-radius: 2px;
+}

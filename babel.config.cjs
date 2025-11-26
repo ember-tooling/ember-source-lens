@@ -4,6 +4,7 @@
  * (and linting)
  */
 const { buildMacros } = require('@embroider/macros/babel');
+const { createPlugin: sourceLens } = require('./src/build/template-plugin.js');
 
 const {
   babelCompatSupport,
@@ -30,6 +31,7 @@ module.exports = {
       {
         transforms: [
           ...(isCompat ? templateCompatSupport() : macros.templateMacros),
+          sourceLens(),
         ],
       },
     ],
