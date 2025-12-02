@@ -64,6 +64,11 @@ export function templatePlugin(env) {
         return false;
       });
 
+      const coords = t.reverseInnerCoordinatesOf(
+        t.parseResults[programNodeIndex],
+        innerCoordinates,
+      );
+
       node.attributes.push(
         recast.builders.attr(
           'data-source-file',
@@ -71,14 +76,11 @@ export function templatePlugin(env) {
         ),
         recast.builders.attr(
           'data-source-line',
-          recast.builders.text(
-            t
-              .reverseInnerCoordinatesOf(
-                t.parseResults[programNodeIndex],
-                innerCoordinates,
-              )
-              .line.toString(),
-          ),
+          recast.builders.text(coords.line.toString()),
+        ),
+        recast.builders.attr(
+          'data-source-column',
+          recast.builders.text((coords.column + 1).toString()),
         ),
       );
 

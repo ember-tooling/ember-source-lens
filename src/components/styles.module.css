@@ -1,11 +1,70 @@
+html {
+  padding-bottom: 40px; /* Make space for the source lens panel */
+}
+
 .source-lens {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  box-sizing: border-box;
+
+  > * {
+    box-sizing: border-box;
+  }
+}
+
+.panel {
+  display: flex;
+  align-items: center;
+  z-index: 10000;
+  background: #f5f5f5;
+  border-top: 1px solid #ccc;
+  height: 40px;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    "Open Sans",
+    "Helvetica Neue",
+    sans-serif;
+}
+
+.location-string {
+  margin-left: 16px;
+  font-size: 14px;
+  color: #333;
+  flex-grow: 1;
+  user-select: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.source-code {
   position: absolute;
-  bottom: 20px;
+  bottom: 8px;
+  left: 50%;
   right: 20px;
+  max-height: 80vh;
+  height: 500px;
+  overflow: auto;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  padding: 8px;
+  margin-top: 8px;
+  box-sizing: border-box;
+  border-radius: 4px;
 }
 
 .source-lens-overlay {
-  position: absolute;
+  position: fixed;
   pointer-events: none;
   background-color: rgba(0, 255, 229, 0.2);
   border: 1px solid rgba(0, 255, 229, 0.8);
@@ -13,4 +72,53 @@
   box-sizing: border-box;
   will-change: top, left, width, height;
   border-radius: 2px;
+}
+
+.panel-title {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 8px;
+  font-weight: bold;
+  font-size: 12px;
+  height: 100%;
+  border-right: 1px solid #ccc;
+  color: #000;
+  text-decoration: none;
+
+  &:hover {
+    background-color: #e0e0e0;
+  }
+}
+
+.panel-action {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 40px;
+  border-right: 1px solid #ccc;
+
+  &:hover {
+    background-color: #e0e0e0;
+  }
+
+  &:active,
+  &.active {
+    background-color: #454549;
+
+    path {
+      fill: #6ce6f9;
+    }
+  }
+}
+
+.panel-group {
+  display: flex;
+  align-items: center;
+  height: 100%;
 }

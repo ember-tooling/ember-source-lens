@@ -17,6 +17,9 @@ importers:
       decorator-transforms:
         specifier: ^2.2.2
         version: 2.3.0(@babel/core@7.28.5)
+      ember-local-storage-decorator:
+        specifier: github:evoactivity/ember-local-storage-decorator#dist
+        version: https://codeload.github.com/evoactivity/ember-local-storage-decorator/tar.gz/0fb735b57293f4703b337f6ebb0e8e7366a403b0(@babel/core@7.28.5)
       ember-modifier:
         specifier: ^4.2.2
         version: 4.2.2(@babel/core@7.28.5)
@@ -26,6 +29,12 @@ importers:
       ember-template-recast:
         specifier: ^6.1.5
         version: 6.1.5
+      modern-monaco:
+        specifier: ^0.3.2
+        version: 0.3.2(typescript@5.8.3)
+      tm-themes:
+        specifier: ^1.10.13
+        version: 1.10.13
     devDependencies:
       '@babel/core':
         specifier: ^7.25.2
@@ -114,9 +123,6 @@ importers:
       content-tag:
         specifier: ^4.0.0
         version: 4.0.0
-      ember-page-title:
-        specifier: ^8.2.0
-        version: 8.2.4(ember-source@6.8.1(@glimmer/component@2.0.0)(rsvp@4.8.5))
       ember-qunit:
         specifier: ^9.0.2
         version: 9.0.4(@ember/test-helpers@5.4.0(@babel/core@7.28.5)(@glint/template@1.7.2))(@glint/template@1.7.2)(qunit@2.24.2)
@@ -2698,14 +2704,12 @@ packages:
       '@typescript-eslint/parser':
         optional: true
 
+  ember-local-storage-decorator@https://codeload.github.com/evoactivity/ember-local-storage-decorator/tar.gz/0fb735b57293f4703b337f6ebb0e8e7366a403b0:
+    resolution: {tarball: https://codeload.github.com/evoactivity/ember-local-storage-decorator/tar.gz/0fb735b57293f4703b337f6ebb0e8e7366a403b0}
+    version: 0.0.0
+
   ember-modifier@4.2.2:
     resolution: {integrity: sha512-pPYBAGyczX0hedGWQFQOEiL9s45KS9efKxJxUQkMLjQyh+1Uef1mcmAGsdw2KmvNupITkE/nXxmVO1kZ9tt3ag==}
-
-  ember-page-title@8.2.4:
-    resolution: {integrity: sha512-ZZ912IRItIEfD5+35w65DT9TmqppK+suXJeaJenD5OSuvujUnYl6KxBpyAbfjw4mYtURwJO/TmSe+4GGJbsJ0w==}
-    engines: {node: 16.* || >= 18}
-    peerDependencies:
-      ember-source: '>= 3.28.0'
 
   ember-primitives@0.45.1:
     resolution: {integrity: sha512-cfgSBYzA4QrNzOXl1wERI3Ao+/cnQgV00KF5qUdepe1I28GLm/KWWU9ps23bplJdc2guThP1QcbQIOkC4PNJHQ==}
@@ -4105,6 +4109,11 @@ packages:
     resolution: {integrity: sha512-IXnMcJ6ZyTuhRmJSjzvHSRhlVPiN9Jwc6e59V0bEJ0ba6OBeX2L0E+mRN1QseeOF4mM+F1Rit6Nh7o+rl2Yn/A==}
     engines: {node: '>0.9'}
 
+  modern-monaco@0.3.2:
+    resolution: {integrity: sha512-oCjbqEfzMvU+3GP48hM66uXiD6RVu2mLfYLolgHSbRxztaw4pAc9vIFVEtr4x5zmP7MEL3Not1jy5ErlyLMX9w==}
+    peerDependencies:
+      typescript: '>= 5.0.0'
+
   ms@2.0.0:
     resolution: {integrity: sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A==}
 
@@ -5158,6 +5167,9 @@ packages:
   tldts@6.1.86:
     resolution: {integrity: sha512-WMi/OQ2axVTf/ykqCQgXiIct+mSQDFdH2fkwhPwgEwvJ1kSzZRiinb0zF2Xb8u4+OqPChmyI6MEu4EezNJz+FQ==}
     hasBin: true
+
+  tm-themes@1.10.13:
+    resolution: {integrity: sha512-ErqacfNfLa98SME1W6CHThQIQbFnPKEkJRAAPL/sqD1jjdlv4pHH1HzoeZHkjyCjLDW47Q49uhmy1uPwL2FzRg==}
 
   tmp@0.0.28:
     resolution: {integrity: sha512-c2mmfiBmND6SOVxzogm1oda0OJ1HZVIk/5n26N59dDTh80MUeavpiCls4PGAdkX1PFkKokLpcf7prSjCeXLsJg==}
@@ -8715,6 +8727,15 @@ snapshots:
       - eslint
       - typescript
 
+  ember-local-storage-decorator@https://codeload.github.com/evoactivity/ember-local-storage-decorator/tar.gz/0fb735b57293f4703b337f6ebb0e8e7366a403b0(@babel/core@7.28.5):
+    dependencies:
+      '@embroider/addon-shim': 1.10.2
+      decorator-transforms: 2.3.0(@babel/core@7.28.5)
+      tracked-built-ins: 4.0.0(@babel/core@7.28.5)
+    transitivePeerDependencies:
+      - '@babel/core'
+      - supports-color
+
   ember-modifier@4.2.2(@babel/core@7.28.5):
     dependencies:
       '@embroider/addon-shim': 1.10.2
@@ -8723,14 +8744,6 @@ snapshots:
       ember-cli-string-utils: 1.1.0
     transitivePeerDependencies:
       - '@babel/core'
-      - supports-color
-
-  ember-page-title@8.2.4(ember-source@6.8.1(@glimmer/component@2.0.0)(rsvp@4.8.5)):
-    dependencies:
-      '@embroider/addon-shim': 1.10.2
-      '@simple-dom/document': 1.4.0
-      ember-source: 6.8.1(@glimmer/component@2.0.0)(rsvp@4.8.5)
-    transitivePeerDependencies:
       - supports-color
 
   ember-primitives@0.45.1(@babel/core@7.28.5)(@ember/test-helpers@5.4.0(@babel/core@7.28.5)(@glint/template@1.7.2))(@ember/test-waiters@4.1.1(@glint/template@1.7.2))(@glimmer/component@2.0.0)(@glint/template@1.7.2)(ember-modifier@4.2.2(@babel/core@7.28.5))(ember-resources@7.0.7(@glimmer/component@2.0.0)(@glint/template@1.7.2))(ember-source@6.8.1(@glimmer/component@2.0.0)(rsvp@4.8.5)):
@@ -10526,6 +10539,10 @@ snapshots:
 
   mktemp@0.4.0: {}
 
+  modern-monaco@0.3.2(typescript@5.8.3):
+    dependencies:
+      typescript: 5.8.3
+
   ms@2.0.0: {}
 
   ms@2.1.3: {}
@@ -11767,6 +11784,8 @@ snapshots:
   tldts@6.1.86:
     dependencies:
       tldts-core: 6.1.86
+
+  tm-themes@1.10.13: {}
 
   tmp@0.0.28:
     dependencies:

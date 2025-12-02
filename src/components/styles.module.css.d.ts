@@ -7,15 +7,36 @@
  */
 
 declare const sourceLens: string;
+declare const panel: string;
+declare const locationString: string;
+declare const sourceCode: string;
 declare const sourceLensOverlay: string;
+declare const panelTitle: string;
+declare const panelAction: string;
+declare const active: string;
+declare const panelGroup: string;
 
 export {
 	sourceLens,
-	sourceLensOverlay
+	panel,
+	locationString,
+	sourceCode,
+	sourceLensOverlay,
+	panelTitle,
+	panelAction,
+	active,
+	panelGroup
 };
 
 declare const __default_export__: {
 	sourceLens: typeof sourceLens;
+	panel: typeof panel;
+	locationString: typeof locationString;
+	sourceCode: typeof sourceCode;
 	sourceLensOverlay: typeof sourceLensOverlay;
+	panelTitle: typeof panelTitle;
+	panelAction: typeof panelAction;
+	active: typeof active;
+	panelGroup: typeof panelGroup;
 };
 export default __default_export__;

@@ -50,9 +50,12 @@
     "@embroider/addon-shim": "^1.8.9",
     "content-tag-utils": "^0.6.0",
     "decorator-transforms": "^2.2.2",
+    "ember-local-storage-decorator": "github:evoactivity/ember-local-storage-decorator#dist",
     "ember-modifier": "^4.2.2",
     "ember-primitives": "^0.45.1",
-    "ember-template-recast": "^6.1.5"
+    "ember-template-recast": "^6.1.5",
+    "modern-monaco": "^0.3.2",
+    "tm-themes": "^1.10.13"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -84,7 +87,6 @@
     "common-tags": "^1.8.2",
     "concurrently": "^9.0.1",
     "content-tag": "^4.0.0",
-    "ember-page-title": "^8.2.0",
     "ember-qunit": "^9.0.2",
     "ember-source": "^6.7.0",
     "ember-strict-application-resolver": "^0.1.0",
