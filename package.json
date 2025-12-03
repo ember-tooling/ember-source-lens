@@ -44,8 +44,8 @@
     "prepack": "rollup --config",
     "start": "pnpm prepack && vite dev",
     "dev": "pnpm start",
-    "test:app": "vite build --mode=development --out-dir dist-tests && testem --file testem.cjs ci --port 0",
-    "test": "vitest"
+    "test:app": "pnpm prepack && vite build --mode=development --out-dir dist-tests && testem --file testem.cjs ci --port 0",
+    "test": "pnpm prepack && vitest"
   },
   "dependencies": {
     "@embroider/addon-shim": "^1.8.9",
