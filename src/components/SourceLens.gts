@@ -226,7 +226,7 @@ const sourceLensModifier = modifier(
     };
 
     const clickElementHandler = (e: MouseEvent) => {
-      e.preventDefault();
+      absorbClicks(e);
       if (!sourceLensState.isEnabled) return;
       if (!sourceLensState.overlayEnabled) return;
       if (!sourceLensState.element) return;
@@ -283,15 +283,25 @@ const sourceLensModifier = modifier(
       }
     };
 
-    try {
-      document.addEventListener('mousemove', moveHandler, { signal });
-      document.addEventListener('mouseup', clickElementHandler, { signal });
-      document.addEventListener('scroll', scrollHandler, { signal });
-      document.addEventListener('keydown', keyHandler, { signal });
-    } catch (error) {
-      console.warn('[Ember Source Lens] Error adding event listeners:', error);
-      return;
-    }
+    const absorbClicks = (e: MouseEvent) => {
+      if (!sourceLensState.isEnabled) return;
+      if (!sourceLensState.overlayEnabled) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      e.stopPropagation();
+    };
+
+    document.addEventListener('keydown', keyHandler, { signal });
+    document.addEventListener('scroll', scrollHandler, { signal });
+    document.addEventListener('mousemove', moveHandler, { signal });
+    document.addEventListener('click', clickElementHandler, {
+      capture: true,
+      signal,
+    });
+    document.addEventListener('mousedown', absorbClicks, {
+      capture: true,
+      signal,
+    });
 
     return () => {
       abortController.abort();
