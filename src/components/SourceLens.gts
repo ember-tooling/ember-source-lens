@@ -439,6 +439,7 @@ export class SourceLens extends Component<SourceLensSignature> {
             <a
               href="https://github.com/ember-tooling/ember-source-lens"
               target="_blank"
+              rel="noopener noreferrer"
               class={{panelTitle}}
             >
               <EmberLogo />
