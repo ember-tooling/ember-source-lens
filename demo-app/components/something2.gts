@@ -1,5 +1,5 @@
 <template>
   <div class="foo">
-    <h1>Inline Editing!</h1>
+    <h1>Inline From Anywhere!</h1>
   </div>
 </template>

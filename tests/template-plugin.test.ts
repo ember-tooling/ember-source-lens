@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { createPlugin } from '../src/build/template-plugin';
+import { createPlugin } from '../src/babel/template-plugin';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
@@ -63,12 +63,12 @@ describe('Adds data attributes to tags', () => {
     });
 
     expect(templateContentsOf(output)).toMatchInlineSnapshot(`
-    [
-      "<div data-source-file="/tests/fixtures/toc.gjs" data-source-line="2" class="foo">
-      <h1 data-source-file="/tests/fixtures/toc.gjs" data-source-line="3">Hello, World!</h1>
-    </div>",
-    ]
-  `);
+      [
+        "<div data-source-file="/tests/fixtures/toc.gjs" data-source-line="2" data-source-column="3" class="foo">
+        <h1 data-source-file="/tests/fixtures/toc.gjs" data-source-line="3" data-source-column="5">Hello, World!</h1>
+      </div>",
+      ]
+    `);
   });
 
   it('works on class components', async () => {
@@ -77,12 +77,12 @@ describe('Adds data attributes to tags', () => {
     });
 
     expect(templateContentsOf(output)).toMatchInlineSnapshot(`
-    [
-      "<section data-source-file="/tests/fixtures/class.gjs" data-source-line="6" class="bar">
-      <p data-source-file="/tests/fixtures/class.gjs" data-source-line="7">Welcome to Ember!</p>
-    </section>",
-    ]
-  `);
+      [
+        "<section data-source-file="/tests/fixtures/class.gjs" data-source-line="6" data-source-column="5" class="bar">
+        <p data-source-file="/tests/fixtures/class.gjs" data-source-line="7" data-source-column="7">Welcome to Ember!</p>
+      </section>",
+      ]
+    `);
   });
 
   it('works on template only components with multiple templates', async () => {
@@ -91,14 +91,14 @@ describe('Adds data attributes to tags', () => {
     });
 
     expect(templateContentsOf(output)).toMatchInlineSnapshot(`
-    [
-      "<div data-source-file="/tests/fixtures/multiple-templates.gjs" data-source-line="2" class="foo">
-      <h1 data-source-file="/tests/fixtures/multiple-templates.gjs" data-source-line="3">Hello, World!</h1>
-    </div>",
-      "<section data-source-file="/tests/fixtures/multiple-templates.gjs" data-source-line="8" class="bar">
-      <p data-source-file="/tests/fixtures/multiple-templates.gjs" data-source-line="9">Welcome to Ember!</p>
-    </section>",
-    ]
-  `);
+      [
+        "<div data-source-file="/tests/fixtures/multiple-templates.gjs" data-source-line="2" data-source-column="3" class="foo">
+        <h1 data-source-file="/tests/fixtures/multiple-templates.gjs" data-source-line="3" data-source-column="5">Hello, World!</h1>
+      </div>",
+        "<section data-source-file="/tests/fixtures/multiple-templates.gjs" data-source-line="8" data-source-column="3" class="bar">
+        <p data-source-file="/tests/fixtures/multiple-templates.gjs" data-source-line="9" data-source-column="5">Welcome to Ember!</p>
+      </section>",
+      ]
+    `);
   });
 });

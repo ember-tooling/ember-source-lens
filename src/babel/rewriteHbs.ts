@@ -1,6 +1,6 @@
 import recast, { type AST } from 'ember-template-recast';
 import fs from 'node:fs';
-import { fixFilename } from './path/utils.ts';
+import { fixFilename } from './utils.ts';
 import { Transformer } from 'content-tag-utils';
 
 let fileCache = new Map<string, string>();
@@ -74,6 +74,13 @@ export function templatePlugin(env: { filename: string }) {
         return false;
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      const coords = t.reverseInnerCoordinatesOf(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        t.parseResults[programNodeIndex],
+        innerCoordinates,
+      );
+
       node.attributes.push(
         recast.builders.attr(
           'data-source-file',
@@ -81,18 +88,13 @@ export function templatePlugin(env: { filename: string }) {
         ),
         recast.builders.attr(
           'data-source-line',
-          recast.builders.text(
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call
-            t
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-              .reverseInnerCoordinatesOf(
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                t.parseResults[programNodeIndex],
-                innerCoordinates,
-              )
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-              .line.toString(),
-          ),
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+          recast.builders.text(coords.line.toString()),
+        ),
+        recast.builders.attr(
+          'data-source-column',
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+          recast.builders.text((coords.column + 1).toString()),
         ),
       );
 
@@ -112,9 +114,6 @@ export function templatePlugin(env: { filename: string }) {
         currentProgramCount === expectedProgramCount &&
         processedCount === totalElements
       ) {
-        console.log(
-          `[${env.filename}] Processed all ${totalElements} elements in ${expectedProgramCount} programs, clearing cache`,
-        );
         programNodesForFile = new Map<string, AST.Program[]>();
         processedElementsForFile = new Map<string, number>();
         fileCache = new Map<string, string>();

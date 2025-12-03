@@ -4,7 +4,7 @@
  * (and linting)
  */
 const { buildMacros } = require('@embroider/macros/babel');
-const { createPlugin: sourceLens } = require('./src/build/template-plugin.js');
+const { createPlugin: sourceLens } = require('./dist/babel/template-plugin.js');
 
 const {
   babelCompatSupport,

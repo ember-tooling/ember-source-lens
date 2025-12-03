@@ -1,4 +1,4 @@
-import { init } from 'modern-monaco';
+import type { init } from 'modern-monaco';
 import Modifier from 'ember-modifier';
 import type { editor } from 'modern-monaco/editor-core';
 import type { TOC } from '@ember/component/template-only';
@@ -13,6 +13,8 @@ interface MonacoEditorModifierSignature {
       number | null,
       number | null,
       (value: string) => void,
+      () => void,
+      boolean,
     ];
   };
 }
@@ -29,16 +31,24 @@ const languageMap: Record<string, string> = {
 };
 
 class MonacoEditor extends Modifier<MonacoEditorModifierSignature> {
+  setupCalled = false;
+  currentContent = '';
   declare editor: editor.IStandaloneCodeEditor;
   declare monaco: Awaited<ReturnType<typeof init>>;
   saveAction: (value: string) => void = () => {};
+  disableAction: () => void = () => {};
 
   async setup(element: HTMLElement) {
+    const init = await import('modern-monaco').then((mod) => mod.init);
     this.monaco = await init({
-      theme: 'vitesse-dark',
+      theme: 'dark-plus',
     });
 
-    this.editor = this.monaco.editor.create(element);
+    this.editor = this.monaco.editor.create(element, {
+      padding: {
+        top: 10,
+      },
+    });
 
     this.monaco.editor.addEditorAction({
       id: 'save-action',
@@ -46,6 +56,19 @@ class MonacoEditor extends Modifier<MonacoEditorModifierSignature> {
       keybindings: [this.monaco.KeyMod.CtrlCmd | this.monaco.KeyCode.KeyS],
       run: (ed) => {
         this.saveAction(ed.getValue());
+      },
+    });
+
+    this.monaco.editor.addEditorAction({
+      id: 'disable',
+      label: 'Disable Ember Source Lens',
+      keybindings: [
+        this.monaco.KeyMod.CtrlCmd |
+          this.monaco.KeyMod.Shift |
+          this.monaco.KeyCode.KeyL,
+      ],
+      run: () => {
+        this.disableAction();
       },
     });
   }
@@ -67,6 +90,9 @@ class MonacoEditor extends Modifier<MonacoEditorModifierSignature> {
     this.editor.setPosition({ lineNumber, column: columnNumber });
     this.editor.revealLine(lineNumber + 10);
     if (focus) {
+      console.log(
+        '[MonacoEditor Modifier] Focusing editor after setting content',
+      );
       this.editor.focus();
     }
   }
@@ -79,19 +105,46 @@ class MonacoEditor extends Modifier<MonacoEditorModifierSignature> {
       lineNumber,
       columnNumber,
       saveAction,
+      disableAction,
+      shouldFocusEditor,
     ]: MonacoEditorModifierSignature['Args']['Positional'],
   ) {
+    this.currentContent = content || '';
     this.saveAction = saveAction;
+    this.disableAction = disableAction;
+
     if (this.editor) {
-      if (content && filename && lineNumber && columnNumber) {
-        this.setContent(content, filename, lineNumber, columnNumber, true);
+      if (this.currentContent && filename && lineNumber && columnNumber) {
+        console.log(
+          '[MonacoEditor Modifier] Updating content in existing editor instance',
+        );
+        this.setContent(
+          this.currentContent,
+          filename,
+          lineNumber,
+          columnNumber,
+          true,
+        );
       }
       return;
     }
+
+    if (this.setupCalled) {
+      return;
+    }
+
+    this.setupCalled = true;
+
     this.setup(element)
       .then(() => {
-        if (content && filename && lineNumber && columnNumber) {
-          this.setContent(content, filename, lineNumber, columnNumber, false);
+        if (this.currentContent && filename && lineNumber && columnNumber) {
+          this.setContent(
+            this.currentContent,
+            filename,
+            lineNumber,
+            columnNumber,
+            shouldFocusEditor,
+          );
         }
       })
       .catch((error) => {
@@ -108,12 +161,22 @@ interface EditorSignature {
     lineNumber: number | null;
     columnNumber: number | null;
     saveAction: (value: string) => void;
+    disableAction: () => void;
+    shouldFocusEditor: boolean;
   };
 }
 
-export const Editor = <template>
+export const Editor: TOC<EditorSignature> = <template>
   <div
     ...attributes
-    {{MonacoEditor @content @filepath @lineNumber @columnNumber @saveAction}}
+    {{MonacoEditor
+      @content
+      @filepath
+      @lineNumber
+      @columnNumber
+      @saveAction
+      @disableAction
+      @shouldFocusEditor
+    }}
   ></div>
-</template> satisfies TOC<EditorSignature>;
+</template>;

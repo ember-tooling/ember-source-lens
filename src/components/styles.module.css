@@ -3,25 +3,28 @@ html {
 }
 
 .source-lens {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-
   box-sizing: border-box;
 
-  > * {
+  *,
+  *::before,
+  *::after {
     box-sizing: border-box;
   }
 }
 
 .panel {
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
   z-index: 10000;
   background: #f5f5f5;
   border-top: 1px solid #ccc;
   height: 40px;
+  white-space: nowrap;
   font-family:
     system-ui,
     -apple-system,
@@ -37,27 +40,38 @@ html {
 }
 
 .location-string {
-  margin-left: 16px;
+  display: flex;
   font-size: 14px;
   color: #333;
+  border-right: 1px solid #ccc;
   flex-grow: 1;
   user-select: none;
+  height: 100%;
+  width: 100%;
+  align-items: center;
+  padding: 4px 16px;
+  margin-right: auto;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+
+  span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 .source-code {
-  position: absolute;
-  bottom: 8px;
-  left: 50%;
-  right: 20px;
-  max-height: 80vh;
-  height: 500px;
+  position: fixed;
+  bottom: 48px;
+  top: 40%;
+  max-width: 900px;
+  width: calc(100% - 16px);
+  right: 8px;
   overflow: auto;
-  background: #f5f5f5;
-  border: 1px solid #ddd;
-  padding: 8px;
+  background: #181818;
+  border: 1px solid #1c1c1c;
+  padding: 0;
+  overflow: hidden;
   margin-top: 8px;
   box-sizing: border-box;
   border-radius: 4px;
@@ -95,12 +109,11 @@ html {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px;
+  padding: 4px 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
-  width: 40px;
   border-right: 1px solid #ccc;
 
   &:hover {
@@ -109,7 +122,8 @@ html {
 
   &:active,
   &.active {
-    background-color: #454549;
+    background-color: #34343a;
+    color: #6ce6f9;
 
     path {
       fill: #6ce6f9;

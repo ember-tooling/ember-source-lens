@@ -65,6 +65,16 @@ interface SourceLensSignature {
   Element: HTMLDivElement;
   Args: {
     projectRoot?: string;
+    editor?:
+      | 'vscode'
+      | 'code'
+      | 'webstorm'
+      | 'intellij'
+      | 'atom'
+      | 'sublime'
+      | 'sublimetext'
+      | 'cursor'
+      | 'windsurf';
   };
 }
 
@@ -81,14 +91,54 @@ class SourceLensState {
     | null = null;
   @localStorage('source-lens:selectedColumn') selectedColumn: number | null =
     null;
+  @localStorage('source-lens:editorEnabled') editorEnabled: boolean = false;
 
   @tracked overlayEnabled: boolean = false;
   @tracked element: HTMLElementWithSource | null = null;
   @tracked boundingClientRect: DOMRect | null = null;
   @tracked scrollDistance: number = 0;
+  @tracked shouldFocusEditor: boolean = false;
 
   toggleOverlay = () => {
     this.overlayEnabled = !this.overlayEnabled;
+  };
+
+  toggleEnabled = () => {
+    console.log('[Ember Source Lens] Toggling source lens state');
+    this.isEnabled = !this.isEnabled;
+
+    // Clear state when disabling
+    if (!this.isEnabled) {
+      this.element = null;
+      this.boundingClientRect = null;
+      this.scrollDistance = 0;
+    }
+  };
+
+  toggleEditor = () => {
+    this.editorEnabled = !this.editorEnabled;
+
+    if (this.editorEnabled) {
+      this.shouldFocusEditor = true;
+    } else {
+      this.shouldFocusEditor = false;
+    }
+  };
+
+  resetState = () => {
+    console.log('[Ember Source Lens] Resetting source lens state');
+    this.element = null;
+    this.filePath = null;
+    this.lineNumber = null;
+    this.columnNumber = null;
+    this.boundingClientRect = null;
+    this.selectedFile = null;
+    this.selectedLineNumber = null;
+    this.selectedColumn = null;
+    this.currentFileContent = '';
+    this.editorEnabled = false;
+    this.overlayEnabled = false;
+    this.scrollDistance = 0;
   };
 }
 
@@ -151,11 +201,16 @@ const sourceLensModifier = modifier(
       try {
         const el = document.elementFromPoint(e.clientX, e.clientY);
 
-        if (el?.closest(`.${sourceLens}`) || !el) {
+        if (!el || el?.closest(`.${sourceLens}`) || !isElementWithSource(el)) {
+          sourceLensState.element = null;
+          sourceLensState.filePath = null;
+          sourceLensState.lineNumber = null;
+          sourceLensState.columnNumber = null;
+          sourceLensState.boundingClientRect = null;
           return;
         }
+
         if (el === sourceLensState.element) return;
-        if (!isElementWithSource(el)) return;
 
         sourceLensState.element = el;
         sourceLensState.filePath = el.sourceFile;
@@ -223,18 +278,8 @@ const sourceLensModifier = modifier(
         e.key.toLowerCase() === 'l'
       ) {
         e.preventDefault();
-        console.log('[Ember Source Lens] Toggling source lens state');
-        sourceLensState.isEnabled = !sourceLensState.isEnabled;
-        console.log(
-          `[Ember Source Lens] ${sourceLensState.isEnabled ? 'Enabled' : 'Disabled'}`,
-        );
-
-        // Clear state when disabling
-        if (!sourceLensState.isEnabled) {
-          sourceLensState.element = null;
-          sourceLensState.boundingClientRect = null;
-          sourceLensState.scrollDistance = 0;
-        }
+        sourceLensState.toggleEnabled();
+        sourceLensState.resetState();
       }
     };
 
@@ -256,13 +301,31 @@ const sourceLensModifier = modifier(
 );
 
 export class SourceLens extends Component<SourceLensSignature> {
+  @tracked fileSystemConnected: boolean = false;
+
   constructor(owner: Owner, args: SourceLensSignature['Args']) {
     super(owner, args);
 
     if (import.meta.hot) {
+      import.meta.hot.send('source-lens:check-connection');
+
+      import.meta.hot.on('source-lens:connected', () => {
+        console.log('[Ember Source Lens] Vite WS system connected');
+        this.fileSystemConnected = true;
+
+        if (this.sourceLensState.selectedFile) {
+          const absolutePath = this.absolutePath;
+
+          import.meta.hot?.send('source-lens:open-file', { absolutePath });
+        }
+      });
+
       import.meta.hot.on(
         'source-lens:file-response',
         (data: { file: string }) => {
+          console.log(
+            '[Ember Source Lens] Received file content from Vite plugin',
+          );
           this.sourceLensState.currentFileContent = data.file;
         },
       );
@@ -285,6 +348,15 @@ export class SourceLens extends Component<SourceLensSignature> {
     ) {
       return `${this.sourceLensState.filePath}:${this.sourceLensState.lineNumber}:${this.sourceLensState.columnNumber ?? 1}`;
     }
+
+    if (
+      this.sourceLensState.selectedFile &&
+      this.sourceLensState.selectedLineNumber &&
+      this.sourceLensState.selectedColumn
+    ) {
+      return `${this.sourceLensState.selectedFile}:${this.sourceLensState.selectedLineNumber}:${this.sourceLensState.selectedColumn}`;
+    }
+
     return '';
   }
 
@@ -298,20 +370,58 @@ export class SourceLens extends Component<SourceLensSignature> {
 
   saveAction = (newContent: string) => {
     console.log('[Ember Source Lens] Save action triggered');
-    const absolutePath =
-      `${this.projectRoot}/${this.sourceLensState.selectedFile}`.replace(
-        '///',
-        '/',
-      );
 
     this.sourceLensState.currentFileContent = newContent;
 
     if (import.meta.hot) {
       import.meta.hot.send('source-lens:save-file', {
-        absolutePath,
         content: newContent,
       });
     }
+  };
+
+  get absolutePath() {
+    return `${this.projectRoot}/${this.sourceLensState.selectedFile}`.replace(
+      '///',
+      '/',
+    );
+  }
+
+  get editorUrl() {
+    const editor = this.args.editor || 'vscode';
+    const absolutePath = this.absolutePath;
+    const lineNumber = this.sourceLensState.selectedLineNumber;
+    const column = this.sourceLensState.selectedColumn;
+    const projectRoot = this.args.projectRoot;
+
+    switch (editor.toLowerCase()) {
+      case 'vscode':
+      case 'code':
+        return `vscode://file${absolutePath}:${lineNumber}:${column}`;
+      case 'webstorm':
+      case 'intellij':
+        return `jetbrains://idea/navigate/reference?project=${projectRoot || 'project'}&path=${absolutePath}&line=${lineNumber}&column=${column}`;
+      case 'atom':
+        return `atom://core/open/file?file=${encodeURIComponent(absolutePath)}&line=${lineNumber}&column=${column}`;
+      case 'sublime':
+      case 'sublimetext':
+        return `subl://open?url=file://${encodeURIComponent(absolutePath)}&line=${lineNumber}&column=${column}`;
+      case 'cursor':
+        return `cursor://file${absolutePath}:${lineNumber}:${column}`;
+      case 'windsurf':
+        return `windsurf://file${absolutePath}:${lineNumber}:${column}`;
+      default:
+        console.warn(
+          `[Ember Source Lens] Unknown editor "${editor}", falling back to VS Code`,
+        );
+        return `vscode://file${absolutePath}:${lineNumber}:${column}`;
+    }
+  }
+
+  openIDE = () => {
+    console.log('[Ember Source Lens] Open in IDE action triggered');
+
+    window.location.href = this.editorUrl;
   };
 
   <template>
@@ -347,25 +457,74 @@ export class SourceLens extends Component<SourceLensSignature> {
             </button>
           </div>
           <div class={{locationString}}>
-            {{this.locationString}}
+            <span>
+              {{if
+                this.locationString
+                this.locationString
+                "No component selected"
+              }}
+            </span>
+          </div>
+          <div class={{panelGroup}}>
+            {{#if this.sourceLensState.selectedFile}}
+
+              <button
+                type="button"
+                class={{panelAction}}
+                {{on "click" this.openIDE}}
+              >
+                Open in IDE
+              </button>
+
+              {{#if this.fileSystemConnected}}
+                <button
+                  type="button"
+                  class={{concat
+                    panelAction
+                    " "
+                    (if this.sourceLensState.editorEnabled active)
+                  }}
+                  {{on "click" this.sourceLensState.toggleEditor}}
+                >
+                  Inline Editor
+                </button>
+              {{/if}}
+
+              <button
+                type="button"
+                class={{panelAction}}
+                {{on "click" this.sourceLensState.resetState}}
+              >
+                Clear State
+              </button>
+
+            {{/if}}
+
           </div>
 
-          <Editor
-            class={{sourceCode}}
-            @content={{this.sourceLensState.currentFileContent}}
-            @filepath={{this.sourceLensState.selectedFile}}
-            @lineNumber={{this.sourceLensState.selectedLineNumber}}
-            @columnNumber={{this.sourceLensState.selectedColumn}}
-            @saveAction={{this.saveAction}}
-          />
-
-          {{#if this.sourceLensState.overlayEnabled}}
-            <div
-              class={{sourceLensOverlay}}
-              style={{htmlSafe this.overlayRectStyleString}}
-            ></div>
-          {{/if}}
         </div>
+
+        {{#if this.fileSystemConnected}}
+          {{#if this.sourceLensState.editorEnabled}}
+            <Editor
+              class={{sourceCode}}
+              @content={{this.sourceLensState.currentFileContent}}
+              @filepath={{this.sourceLensState.selectedFile}}
+              @lineNumber={{this.sourceLensState.selectedLineNumber}}
+              @columnNumber={{this.sourceLensState.selectedColumn}}
+              @saveAction={{this.saveAction}}
+              @disableAction={{this.sourceLensState.toggleEnabled}}
+              @shouldFocusEditor={{this.sourceLensState.shouldFocusEditor}}
+            />
+          {{/if}}
+        {{/if}}
+
+        {{#if this.sourceLensState.overlayEnabled}}
+          <div
+            class={{sourceLensOverlay}}
+            style={{htmlSafe this.overlayRectStyleString}}
+          ></div>
+        {{/if}}
       {{/if}}
     </div>
   </template>
