@@ -31,6 +31,25 @@ let programNodesForFile = new Map<string, AST.Program[]>();
 let processedElementsForFile = new Map<string, number>(); // Track processed elements per file
 
 export function templatePlugin(env: { filename: string }) {
+  const isProduction =
+    process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'prod';
+
+  if (isProduction) {
+    return {
+      Program: {
+        enter(node: AST.Program) {
+          const srcLensNode = node.body.findIndex(
+            (n) => n.type === 'ElementNode' && n.tag === 'SourceLens',
+          );
+
+          if (srcLensNode !== -1) {
+            node.body.splice(srcLensNode, 1);
+          }
+        },
+      },
+    };
+  }
+
   const file = getFullFileContent(env.filename);
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
   const t = new Transformer(file);
@@ -52,6 +71,10 @@ export function templatePlugin(env: { filename: string }) {
       }
     },
     ElementNode(node: AST.ElementNode) {
+      if (expectedProgramCount === 0) {
+        return;
+      }
+
       const innerCoordinates = {
         line: node.loc.startPosition.line,
         column: node.loc.startPosition.column,
@@ -59,7 +82,7 @@ export function templatePlugin(env: { filename: string }) {
         endLine: node.loc.endPosition.line,
       };
 
-      let programNodeIndex = 0;
+      let programNodeIndex = -1;
 
       const programNodes = programNodesForFile.get(env.filename) || [];
 

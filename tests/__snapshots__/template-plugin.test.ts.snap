@@ -1,0 +1,57 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Adds data attributes to tags > handles a compiled component 1`] = `
+[
+  "<div class={{sourceLens}} ...attributes {{sourceLensModifier projectRoot=this.projectRoot sourceLensState=this.sourceLensState}}>
+  {{#if this.sourceLensState.isEnabled}}
+    <div class={{panel}}>
+      <div class={{panelGroup}}>
+        <a href="https://github.com/ember-tooling/ember-source-lens" target="_blank" rel="noopener noreferrer" class={{panelTitle}}>
+          <EmberLogo />
+          Source Lens
+        </a>
+        <button type="button" class={{concat panelAction " " (if this.sourceLensState.overlayEnabled active)}} {{on "click" this.sourceLensState.toggleOverlay}}>
+          <InspectIcon />
+        </button>
+      </div>
+      <div class={{locationString}}>
+        <span>
+          {{if this.locationString this.locationString "No component selected"}}
+        </span>
+      </div>
+      <div class={{panelGroup}}>
+        {{#if this.sourceLensState.selectedFile}}
+
+          <button type="button" class={{panelAction}} {{on "click" this.openIDE}}>
+            Open in IDE
+          </button>
+
+          {{#if this.fileSystemConnected}}
+            <button type="button" class={{concat panelAction " " (if this.sourceLensState.editorEnabled active)}} {{on "click" this.sourceLensState.toggleEditor}}>
+              Inline Editor
+            </button>
+          {{/if}}
+
+          <button type="button" class={{panelAction}} {{on "click" this.sourceLensState.resetState}}>
+            Clear State
+          </button>
+
+        {{/if}}
+
+      </div>
+
+    </div>
+
+    {{#if this.fileSystemConnected}}
+      {{#if this.sourceLensState.editorEnabled}}
+        <Editor class={{sourceCode}} @content={{this.sourceLensState.currentFileContent}} @filepath={{this.sourceLensState.selectedFile}} @lineNumber={{this.sourceLensState.selectedLineNumber}} @columnNumber={{this.sourceLensState.selectedColumn}} @saveAction={{this.saveAction}} @disableAction={{this.sourceLensState.toggleEnabled}} @shouldFocusEditor={{this.sourceLensState.shouldFocusEditor}} />
+      {{/if}}
+    {{/if}}
+
+    {{#if this.sourceLensState.overlayEnabled}}
+      <div class={{sourceLensOverlay}} style={{htmlSafe this.overlayRectStyleString}}></div>
+    {{/if}}
+  {{/if}}
+</div>",
+]
+`;

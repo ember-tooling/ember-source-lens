@@ -126,7 +126,7 @@ function saveFile(data: FileSaveMessageData) {
   }
 }
 
-export default function plugin(): Plugin {
+export function sourceLens(): Plugin {
   return {
     name: 'ember-source-lens-file-handler',
     configureServer(server: ViteDevServer) {

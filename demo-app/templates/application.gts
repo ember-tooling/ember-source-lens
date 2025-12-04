@@ -1,6 +1,6 @@
 import Something from '../components/something.gts';
 import Something2 from '../components/something2.gts';
-import { SourceLens } from '../../src/components/SourceLens.gts';
+import { SourceLens } from 'ember-source-lens';
 
 const Thing = <template>
   <div>Or open it in your wow</div>

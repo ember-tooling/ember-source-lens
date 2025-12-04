@@ -5,8 +5,8 @@ import jscodeshift from 'jscodeshift';
 import { describe, expect, it } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
-
-import { createPlugin } from '../src/babel/template-plugin';
+import { sourceLens } from '#src/babel/plugin.ts';
+import { leadingSlashPath } from '#src/babel/const.ts';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
@@ -22,11 +22,33 @@ async function transform(filename: string, config = {}) {
         'babel-plugin-ember-template-compilation',
         {
           targetFormat: 'hbs',
-          transforms: [createPlugin(config)],
+          transforms: [sourceLens.template(config)],
         },
       ],
+      sourceLens(),
     ],
     filename: fsPath,
+    babelrc: false,
+    configFile: false,
+  });
+
+  return result?.code;
+}
+
+async function transformInline(file: string, filename: string, config = {}) {
+  const { code: js } = p.process(file);
+  const result = await babel.transformAsync(js, {
+    plugins: [
+      [
+        'babel-plugin-ember-template-compilation',
+        {
+          targetFormat: 'hbs',
+          transforms: [sourceLens.template(config)],
+        },
+      ],
+      sourceLens(),
+    ],
+    filename: filename || 'src/components/example-component.gjs',
     babelrc: false,
     configFile: false,
   });
@@ -100,5 +122,110 @@ describe('Adds data attributes to tags', () => {
       </section>",
       ]
     `);
+  });
+
+  it('it does nothing if node_env is production', async () => {
+    const originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
+
+    const output = await transform('./fixtures/toc.gjs', {
+      additionalRoots: ['tests/fixtures'],
+    });
+
+    expect(templateContentsOf(output)).toMatchInlineSnapshot(`
+      [
+        "<div class="foo">
+        <h1>Hello, World!</h1>
+      </div>",
+      ]
+    `);
+
+    process.env.NODE_ENV = originalNodeEnv;
+  });
+
+  it('it does nothing if path is not relevant', async () => {
+    const output = await transformInline(
+      `
+      export const Foo = <template>
+        <div class="foo">
+          <h1>Hello, World!</h1>
+        </div>
+      </template>`,
+      leadingSlashPath.atEmbroider + '/some-addon/components/foo.gjs',
+    );
+
+    expect(templateContentsOf(output)).toMatchInlineSnapshot(`
+      [
+        "<div class="foo">
+        <h1>Hello, World!</h1>
+      </div>",
+      ]
+    `);
+  });
+
+  it('handles normal js files', async () => {
+    const output = await transformInline(
+      `export { SourceLens } from './dist/components/source-lens.js';`,
+      'src/utils/example.js',
+    );
+
+    expect(output).toMatchInlineSnapshot(
+      `"export { SourceLens } from './dist/components/source-lens.js';"`,
+    );
+  });
+
+  it('handles a compiled component', async () => {
+    const output = await transform('./fixtures/compiled-component.js', {
+      additionalRoots: ['tests/fixtures'],
+    });
+
+    expect(templateContentsOf(output)).toMatchSnapshot();
+  });
+});
+
+describe('removes SourceLens component and import in production', () => {
+  it('works on template only components', async () => {
+    const originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
+
+    const output = await transform('./fixtures/remove-sourcelens.gjs', {
+      additionalRoots: ['tests/fixtures'],
+    });
+
+    expect(output).toMatchInlineSnapshot(`
+        "import { precompileTemplate } from "@ember/template-compilation";
+        import { setComponentTemplate } from "@ember/component";
+        import templateOnly from "@ember/component/template-only";
+        export default setComponentTemplate(precompileTemplate("\\n  <h1>Hello, Source Lens!</h1>\\n  \\n", {
+          strictMode: true
+        }), templateOnly());"
+      `);
+    process.env.NODE_ENV = originalNodeEnv;
+  });
+
+  it('works on class components', async () => {
+    const originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
+
+    const output = await transform('./fixtures/remove-sourcelens-class.gjs', {
+      additionalRoots: ['tests/fixtures'],
+    });
+
+    expect(output).toMatchInlineSnapshot(`
+        "import Component from '@glimmer/component';
+        import { precompileTemplate } from "@ember/template-compilation";
+        import { setComponentTemplate } from "@ember/component";
+        export default class MyComponent extends Component {
+          get thing() {
+            return 'value';
+          }
+          static {
+            setComponentTemplate(precompileTemplate("\\n    <h1>Hello, Source Lens!</h1>\\n    \\n  ", {
+              strictMode: true
+            }), this);
+          }
+        }"
+      `);
+    process.env.NODE_ENV = originalNodeEnv;
   });
 });

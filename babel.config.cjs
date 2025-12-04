@@ -4,7 +4,7 @@
  * (and linting)
  */
 const { buildMacros } = require('@embroider/macros/babel');
-const { createPlugin: sourceLens } = require('./dist/babel/template-plugin.js');
+const { sourceLens } = require('ember-source-lens/babel');
 
 const {
   babelCompatSupport,
@@ -31,7 +31,7 @@ module.exports = {
       {
         transforms: [
           ...(isCompat ? templateCompatSupport() : macros.templateMacros),
-          sourceLens(),
+          sourceLens.template(),
         ],
       },
     ],
@@ -44,6 +44,7 @@ module.exports = {
       },
     ],
     ...(isCompat ? babelCompatSupport() : macros.babelMacros),
+    sourceLens(),
   ],
 
   generatorOpts: {

@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import { extensions, ember, classicEmberSupport } from '@embroider/vite';
 import { babel } from '@rollup/plugin-babel';
 import { patchCssModules } from 'vite-css-modules';
-import SourceLens from './dist/vite-plugin.js';
+import { sourceLens } from 'ember-source-lens/vite';
 
 // For scenario testing
 const isCompat = Boolean(process.env.ENABLE_COMPAT_BUILD);
@@ -18,7 +18,7 @@ export default defineConfig({
       babelHelpers: 'inline',
       extensions,
     }),
-    SourceLens(),
+    sourceLens(),
   ],
   css: {
     modules: {

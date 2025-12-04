@@ -18,12 +18,9 @@
       "types": "./declarations/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./addon-main.js": "./addon-main.cjs",
-    "./*.css": "./dist/*.css",
-    "./*": {
-      "types": "./declarations/*.d.ts",
-      "default": "./dist/*.js"
-    }
+    "./babel": "./dist/babel/plugin.js",
+    "./vite": "./dist/vite-plugin.js",
+    "./addon-main.js": "./addon-main.cjs"
   },
   "files": [
     "addon-main.cjs",
@@ -45,7 +42,8 @@
     "start": "pnpm prepack && vite dev",
     "dev": "pnpm start",
     "test:app": "pnpm prepack && vite build --mode=development --out-dir dist-tests && testem --file testem.cjs ci --port 0",
-    "test": "pnpm prepack && vitest"
+    "test": "pnpm prepack && vitest",
+    "test:ui": "pnpm prepack && vitest --ui"
   },
   "dependencies": {
     "@embroider/addon-shim": "^1.8.9",
@@ -55,14 +53,15 @@
     "ember-modifier": "^4.2.2",
     "ember-primitives": "^0.45.1",
     "ember-template-recast": "^6.1.5",
-    "modern-monaco": "^0.3.3",
-    "tm-themes": "^1.10.13"
+    "modern-monaco": "^0.3.3"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@babel/eslint-parser": "^7.25.1",
     "@babel/plugin-transform-typescript": "^7.25.2",
     "@babel/runtime": "^7.25.6",
+    "@babel/traverse": "^7.28.5",
+    "@babel/types": "^7.28.5",
     "@ember/app-tsconfig": "^1.0.0",
     "@ember/library-tsconfig": "^1.0.0",
     "@ember/test-helpers": "^5.2.1",
@@ -80,10 +79,12 @@
     "@glint/tsserver-plugin": "^2.0.0",
     "@rollup/plugin-babel": "^6.0.4",
     "@types/babel__core": "^7.20.5",
+    "@types/babel__traverse": "^7.28.0",
     "@types/common-tags": "^1.8.4",
     "@types/jscodeshift": "^17.3.0",
     "@types/node": "^24.10.1",
     "@types/qunit": "^2.19.12",
+    "@vitest/ui": "4.0.8",
     "babel-plugin-ember-template-compilation": "^2.2.5",
     "common-tags": "^1.8.2",
     "concurrently": "^9.0.1",

@@ -90,9 +90,6 @@ class MonacoEditor extends Modifier<MonacoEditorModifierSignature> {
     this.editor.setPosition({ lineNumber, column: columnNumber });
     this.editor.revealLine(lineNumber + 10);
     if (focus) {
-      console.log(
-        '[MonacoEditor Modifier] Focusing editor after setting content',
-      );
       this.editor.focus();
     }
   }
@@ -115,9 +112,6 @@ class MonacoEditor extends Modifier<MonacoEditorModifierSignature> {
 
     if (this.editor) {
       if (this.currentContent && filename && lineNumber && columnNumber) {
-        console.log(
-          '[MonacoEditor Modifier] Updating content in existing editor instance',
-        );
         this.setContent(
           this.currentContent,
           filename,
