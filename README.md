@@ -1,4 +1,4 @@
-<center>
+<div align="center">
 
 # 🔍 Ember Source Lens
 
@@ -10,7 +10,7 @@
 
 Ember Source Lens is a powerful development tool that lets you navigate your Ember codebase by clicking on any rendered component to jump directly to its source file in your editor. Perfect for large codebases where finding component definitions can be tricky.
 
-</center>
+</div>
 
 ## ✨ Features
 
