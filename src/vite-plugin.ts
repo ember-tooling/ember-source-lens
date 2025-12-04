@@ -131,7 +131,6 @@ export function sourceLens(): Plugin {
     name: 'ember-source-lens-file-handler',
     configureServer(server: ViteDevServer) {
       server.ws.on('source-lens:check-connection', () => {
-        console.log('[ember-source-lens] File system connected');
         server.ws.send('source-lens:connected');
       });
 

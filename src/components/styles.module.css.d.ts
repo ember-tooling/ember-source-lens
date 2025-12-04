@@ -6,8 +6,8 @@
  * https://npmjs.com/vite-css-modules
  */
 
-declare const sourceLens: string;
 declare const panel: string;
+declare const sourceLens: string;
 declare const locationString: string;
 declare const sourceCode: string;
 declare const sourceLensOverlay: string;
@@ -17,8 +17,8 @@ declare const active: string;
 declare const panelGroup: string;
 
 export {
-	sourceLens,
 	panel,
+	sourceLens,
 	locationString,
 	sourceCode,
 	sourceLensOverlay,
@@ -29,8 +29,8 @@ export {
 };
 
 declare const __default_export__: {
-	sourceLens: typeof sourceLens;
 	panel: typeof panel;
+	sourceLens: typeof sourceLens;
 	locationString: typeof locationString;
 	sourceCode: typeof sourceCode;
 	sourceLensOverlay: typeof sourceLensOverlay;

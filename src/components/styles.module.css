@@ -1,4 +1,4 @@
-html {
+html:has(.panel) {
   padding-bottom: 40px; /* Make space for the source lens panel */
 }
 
@@ -42,7 +42,6 @@ html {
 .location-string {
   display: flex;
   font-size: 14px;
-  color: #333;
   border-right: 1px solid #ccc;
   flex-grow: 1;
   user-select: none;
@@ -52,6 +51,15 @@ html {
   padding: 4px 16px;
   margin-right: auto;
   overflow: hidden;
+
+  a {
+    color: #333;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 
   span {
     white-space: nowrap;

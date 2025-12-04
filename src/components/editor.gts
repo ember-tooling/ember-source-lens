@@ -3,6 +3,7 @@ import Modifier from 'ember-modifier';
 import type { editor } from 'modern-monaco/editor-core';
 import type { TOC } from '@ember/component/template-only';
 import { assert } from '@ember/debug';
+import type { SourceLensState } from '#src/lib/shared-state.ts';
 
 interface MonacoEditorModifierSignature {
   Element: HTMLElement;
@@ -12,9 +13,9 @@ interface MonacoEditorModifierSignature {
       string | null,
       number | null,
       number | null,
-      (value: string) => void,
       () => void,
       boolean,
+      (value: string) => void,
     ];
   };
 }
@@ -101,9 +102,9 @@ class MonacoEditor extends Modifier<MonacoEditorModifierSignature> {
       filename,
       lineNumber,
       columnNumber,
-      saveAction,
       disableAction,
       shouldFocusEditor,
+      saveAction,
     ]: MonacoEditorModifierSignature['Args']['Positional'],
   ) {
     this.currentContent = content || '';
@@ -150,13 +151,8 @@ class MonacoEditor extends Modifier<MonacoEditorModifierSignature> {
 interface EditorSignature {
   Element: HTMLDivElement;
   Args: {
-    content: string | null;
-    filepath: string | null;
-    lineNumber: number | null;
-    columnNumber: number | null;
+    sourceLensState: SourceLensState;
     saveAction: (value: string) => void;
-    disableAction: () => void;
-    shouldFocusEditor: boolean;
   };
 }
 
@@ -164,13 +160,13 @@ export const Editor: TOC<EditorSignature> = <template>
   <div
     ...attributes
     {{MonacoEditor
-      @content
-      @filepath
-      @lineNumber
-      @columnNumber
+      @sourceLensState.currentFileContent
+      @sourceLensState.selectedFile
+      @sourceLensState.selectedLineNumber
+      @sourceLensState.selectedColumn
+      @sourceLensState.toggleEnabled
+      @sourceLensState.shouldFocusEditor
       @saveAction
-      @disableAction
-      @shouldFocusEditor
     }}
   ></div>
 </template>;
