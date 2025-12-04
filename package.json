@@ -1,5 +1,5 @@
 {
-  "name": "ember-source-lens",
+  "name": "@ember-tooling/ember-source-lens",
   "version": "0.0.1",
   "description": "Ember Source Lens is a developer tool that allows you to click on rendered Ember components in the browser and jump directly to their source code in your editor.",
   "keywords": [
