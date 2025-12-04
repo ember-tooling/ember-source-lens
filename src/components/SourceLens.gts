@@ -146,7 +146,7 @@ export class SourceLens extends Component<SourceLensSignature> {
               {{#if this.locationString}}
                 <a href={{this.editorUrl}}>{{this.locationString}}</a>
               {{else}}
-                "No component selected"
+                No component selected
               {{/if}}
             </span>
           </div>
