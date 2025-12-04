@@ -1,12 +1,12 @@
-import { sourceLensModifier } from '#src/lib/modifier.ts';
-import { SourceLensState } from '#src/lib/shared-state.ts';
 import { concat } from '@ember/helper';
 import { on } from '@ember/modifier';
 import { htmlSafe } from '@ember/template';
 import Component from '@glimmer/component';
 import { createStore } from 'ember-primitives/store';
-import { getEditorUrl, type EditorType } from '#src/lib/editor-url.ts';
-import { FileSystemBridge } from '#src/lib/file-system-bridge.ts';
+import { getEditorUrl, type EditorType } from '../lib/editor-url.ts';
+import { FileSystemBridge } from '../lib/file-system-bridge.ts';
+import { sourceLensModifier } from '../lib/modifier.ts';
+import { SourceLensState } from '../lib/shared-state.ts';
 import { Editor } from './editor.gts';
 import { EmberLogo, InspectIcon } from './icons.gts';
 import {
