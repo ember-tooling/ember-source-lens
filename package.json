@@ -1,13 +1,13 @@
 {
   "name": "ember-source-lens",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Ember Source Lens is a developer tool that allows you to click on rendered Ember components in the browser and jump directly to their source code in your editor.",
   "keywords": [
     "ember-addon"
   ],
   "repository": {
     "type": "git",
-    "url": "git@github.com:ember-tooling/ember-code-lens.git"
+    "url": "git@github.com:ember-tooling/ember-source-lens.git"
   },
   "license": "MIT",
   "author": "Liam Potter",
