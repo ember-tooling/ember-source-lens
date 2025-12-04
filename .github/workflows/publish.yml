@@ -12,6 +12,10 @@ on:
     paths:
       - '.release-plan.json'
 
+permissions:
+  id-token: write  # Required for OIDC
+  contents: read
+
 concurrency:
   group: publish-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
