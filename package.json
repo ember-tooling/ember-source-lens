@@ -1,15 +1,17 @@
 {
   "name": "ember-source-lens",
   "version": "0.0.0",
-  "description": "The default blueprint for Embroider v2 addons.",
-  "packageManager": "pnpm@10.20.0",
+  "description": "Ember Source Lens is a developer tool that allows you to click on rendered Ember components in the browser and jump directly to their source code in your editor.",
   "keywords": [
     "ember-addon"
   ],
-  "type": "module",
-  "repository": "",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:ember-tooling/ember-code-lens.git"
+  },
   "license": "MIT",
-  "author": "",
+  "author": "Liam Potter",
+  "type": "module",
   "imports": {
     "#src/*": "./src/*"
   },
@@ -29,6 +31,7 @@
   ],
   "scripts": {
     "build": "rollup --config",
+    "dev": "pnpm start",
     "format": "prettier . --cache --write",
     "lint": "concurrently \"pnpm:lint:*(!fix)\" --names \"lint:\" --prefixColors auto",
     "lint:fix": "concurrently \"pnpm:lint:*:fix\" --names \"fix:\" --prefixColors auto && pnpm run format",
@@ -40,9 +43,8 @@
     "lint:types": "ember-tsc --noEmit",
     "prepack": "rollup --config",
     "start": "pnpm prepack && vite dev",
-    "dev": "pnpm start",
-    "test:app": "pnpm prepack && vite build --mode=development --out-dir dist-tests && testem --file testem.cjs ci --port 0",
     "test": "pnpm prepack && vitest",
+    "test:app": "pnpm prepack && vite build --mode=development --out-dir dist-tests && testem --file testem.cjs ci --port 0",
     "test:ui": "pnpm prepack && vitest --ui"
   },
   "dependencies": {
@@ -105,6 +107,7 @@
     "prettier-plugin-ember-template-tag": "^2.0.4",
     "qunit": "^2.24.1",
     "qunit-dom": "^3.4.0",
+    "release-plan": "^0.17.0",
     "rollup": "^4.22.5",
     "rollup-plugin-postcss": "^4.0.2",
     "testem": "^3.15.1",
@@ -114,6 +117,7 @@
     "vite-css-modules": "^1.11.1",
     "vitest": "^4.0.8"
   },
+  "packageManager": "pnpm@10.20.0",
   "ember": {
     "edition": "octane"
   },
