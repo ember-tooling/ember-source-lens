@@ -1,3 +1,6 @@
+> [!WARNING]  
+> Ember Source Lens is currently in early development, some aspects may still be unstable or incomplete. Please report any issues you encounter on the [GitHub Issues page](https://github.com/ember-tooling/ember-source-lens/issues). Failing tests would be much appreciated to help us improve the project. Thank you for your understanding and support!
+
 <div align="center">
 
 # 🔍 Ember Source Lens

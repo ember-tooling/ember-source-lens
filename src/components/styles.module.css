@@ -4,11 +4,28 @@ html:has(.panel) {
 
 .source-lens {
   box-sizing: border-box;
+  font-size: 14px;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    "Open Sans",
+    "Helvetica Neue",
+    sans-serif;
 
   *,
   *::before,
   *::after {
     box-sizing: border-box;
+  }
+
+  svg {
+    max-width: none;
   }
 }
 
@@ -25,23 +42,11 @@ html:has(.panel) {
   border-top: 1px solid #ccc;
   height: 40px;
   white-space: nowrap;
-  font-family:
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    Oxygen,
-    Ubuntu,
-    Cantarell,
-    "Open Sans",
-    "Helvetica Neue",
-    sans-serif;
 }
 
 .location-string {
   display: flex;
-  font-size: 14px;
+  font: inherit;
   border-right: 1px solid #ccc;
   flex-grow: 1;
   user-select: none;
@@ -84,6 +89,7 @@ html:has(.panel) {
   margin-top: 8px;
   box-sizing: border-box;
   border-radius: 4px;
+  font: inherit;
 }
 
 .source-lens-overlay {
@@ -102,6 +108,7 @@ html:has(.panel) {
   align-items: center;
   padding: 0 12px;
   gap: 8px;
+  font: inherit;
   font-weight: bold;
   font-size: 12px;
   height: 100%;
@@ -117,6 +124,7 @@ html:has(.panel) {
 .panel-action {
   background: none;
   border: none;
+  font: inherit;
   cursor: pointer;
   padding: 4px 8px;
   display: flex;
