@@ -3,7 +3,7 @@ import Modifier from 'ember-modifier';
 import type { editor } from 'modern-monaco/editor-core';
 import type { TOC } from '@ember/component/template-only';
 import { assert } from '@ember/debug';
-import type { SourceLensState } from '#src/lib/shared-state.ts';
+import type { SourceLensState } from '../lib/shared-state.ts';
 
 interface MonacoEditorModifierSignature {
   Element: HTMLElement;
