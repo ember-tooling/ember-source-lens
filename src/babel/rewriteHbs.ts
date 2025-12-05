@@ -15,7 +15,10 @@ const invalidTagPatterns = [
 ];
 const isInvalidTag = combineRegexPatterns(invalidTagPatterns);
 
-const p = new Preprocessor();
+const CLEARED_CONTENT =
+  '___________ember-source-lens-cleared-content___________';
+
+export const p = new Preprocessor();
 const parsedFiles = new Map<string, Parsed[]>();
 
 function isFileCacheValid(filename: string): boolean {
@@ -30,7 +33,11 @@ function isFileCacheValid(filename: string): boolean {
 
 function parseFile(filename: string, content: string): Parsed[] {
   if (parsedFiles.has(filename) && isFileCacheValid(filename)) {
-    return parsedFiles.get(filename)!;
+    const previouslyParsed = parsedFiles.get(filename);
+
+    if (!previouslyParsed?.every((p) => p.contents === CLEARED_CONTENT)) {
+      return previouslyParsed!;
+    }
   }
   const parsed = p.parse(content);
   parsedFiles.set(filename, parsed);
@@ -148,9 +155,8 @@ export function templatePlugin(env: { filename: string }) {
 
       // If all element nodes have been processed, clear the program contents
       // so files with multiple matching templates find the correct index
-      if (elementNodes.length === 0) {
-        parsed.contents =
-          '___________ember-source-lens-cleared-content___________';
+      if (elementNodes.length === 0 && parsedFile.length > 1) {
+        parsed.contents = CLEARED_CONTENT;
       }
     },
   };

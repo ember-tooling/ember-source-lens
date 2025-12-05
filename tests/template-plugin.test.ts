@@ -218,6 +218,41 @@ describe('Adds data attributes to tags', () => {
       ]
     `);
   });
+
+  it('handles complex components', async () => {
+    const output = await transform('./fixtures/complex.gjs', {
+      additionalRoots: ['tests/fixtures'],
+    });
+
+    expect(templateContentsOf(output)).toMatchInlineSnapshot(`
+      [
+        "<div data-source-file="/tests/fixtures/complex.gjs" data-source-line="4" data-source-column="3" ...attributes>
+        {{yield}}
+      </div>",
+        "<div data-source-file="/tests/fixtures/complex.gjs" data-source-line="15" data-source-column="5">
+        <h1 data-source-file="/tests/fixtures/complex.gjs" data-source-line="16" data-source-column="7">{{this.greeting}}</h1>
+        <p data-source-file="/tests/fixtures/complex.gjs" data-source-line="17" data-source-column="7">Welcome to Ember Source Lens!</p>
+        <div data-source-file="/tests/fixtures/complex.gjs" data-source-line="18" data-source-column="7">
+          {{yield to="customBlock"}}
+        </div>
+        <footer data-source-file="/tests/fixtures/complex.gjs" data-source-line="21" data-source-column="7">
+          <div data-source-file="/tests/fixtures/complex.gjs" data-source-line="22" data-source-column="9">
+            <div data-source-file="/tests/fixtures/complex.gjs" data-source-line="23" data-source-column="11">
+              <div data-source-file="/tests/fixtures/complex.gjs" data-source-line="24" data-source-column="13">
+                <p data-source-file="/tests/fixtures/complex.gjs" data-source-line="25" data-source-column="15">Footer content here.</p>
+              </div>
+            </div>
+          </div>
+        </footer>
+      </div>
+      <AnotherComponent data-source-file="/tests/fixtures/complex.gjs" data-source-line="31" data-source-column="5">
+        <:customBlock>
+          <span data-source-file="/tests/fixtures/complex.gjs" data-source-line="33" data-source-column="9">This is a custom block content.</span>
+        </:customBlock>
+      </AnotherComponent>",
+      ]
+    `);
+  });
 });
 
 describe('removes SourceLens component and import in production', () => {

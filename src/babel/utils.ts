@@ -77,6 +77,7 @@ export function isRelevantFile(
   const roots = [
     leadingSlashPath.componentsDir,
     leadingSlashPath.templatesDir,
+    leadingSlashPath.routesDir,
     ...(additionalRoots || []),
   ];
 
