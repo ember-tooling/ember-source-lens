@@ -1,5 +1,10 @@
 # Changelog
 
+
+
+
+
+
 ## Release (2025-12-05)
 
 * ember-source-lens 0.0.6 (patch)
