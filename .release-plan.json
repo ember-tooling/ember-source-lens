@@ -2,8 +2,8 @@
   "solution": {
     "ember-source-lens": {
       "impact": "patch",
-      "oldVersion": "0.0.4",
-      "newVersion": "0.0.5",
+      "oldVersion": "0.0.5",
+      "newVersion": "0.0.6",
       "tagName": "latest",
       "constraints": [
         {
@@ -14,5 +14,5 @@
       "pkgJSONPath": "./package.json"
     }
   },
-  "description": "## Release (2025-12-05)\n\n* ember-source-lens 0.0.5 (patch)\n\n#### :bug: Bug Fix\n* `ember-source-lens`\n  * [#11](https://github.com/ember-tooling/ember-source-lens/pull/11) Make content-tag a dependency ([@evoactivity](https://github.com/evoactivity))\n\n#### Committers: 1\n- Liam Potter ([@evoactivity](https://github.com/evoactivity))\n"
+  "description": "## Release (2025-12-05)\n\n* ember-source-lens 0.0.6 (patch)\n\n#### :bug: Bug Fix\n* `ember-source-lens`\n  * [#13](https://github.com/ember-tooling/ember-source-lens/pull/13) Fixes for templates in routes folder (pods) ([@evoactivity](https://github.com/evoactivity))\n\n#### Committers: 1\n- Liam Potter ([@evoactivity](https://github.com/evoactivity))\n"
 }
