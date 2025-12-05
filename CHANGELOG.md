@@ -1,5 +1,17 @@
 # Changelog
 
+## Release (2025-12-05)
+
+* ember-source-lens 0.0.4 (patch)
+
+#### :bug: Bug Fix
+* `ember-source-lens`
+  * [#10](https://github.com/ember-tooling/ember-source-lens/pull/10) Better file processing ([@evoactivity](https://github.com/evoactivity))
+  * [#8](https://github.com/ember-tooling/ember-source-lens/pull/8) Handle yield blocks properly ([@evoactivity](https://github.com/evoactivity))
+
+#### Committers: 1
+- Liam Potter ([@evoactivity](https://github.com/evoactivity))
+
 ## Release (2025-12-04)
 
 * ember-source-lens 0.0.3 (patch)
