@@ -2,8 +2,8 @@
   "solution": {
     "ember-source-lens": {
       "impact": "patch",
-      "oldVersion": "0.0.3",
-      "newVersion": "0.0.4",
+      "oldVersion": "0.0.4",
+      "newVersion": "0.0.5",
       "tagName": "latest",
       "constraints": [
         {
@@ -14,5 +14,5 @@
       "pkgJSONPath": "./package.json"
     }
   },
-  "description": "## Release (2025-12-05)\n\n* ember-source-lens 0.0.4 (patch)\n\n#### :bug: Bug Fix\n* `ember-source-lens`\n  * [#10](https://github.com/ember-tooling/ember-source-lens/pull/10) Better file processing ([@evoactivity](https://github.com/evoactivity))\n  * [#8](https://github.com/ember-tooling/ember-source-lens/pull/8) Handle yield blocks properly ([@evoactivity](https://github.com/evoactivity))\n\n#### Committers: 1\n- Liam Potter ([@evoactivity](https://github.com/evoactivity))\n"
+  "description": "## Release (2025-12-05)\n\n* ember-source-lens 0.0.5 (patch)\n\n#### :bug: Bug Fix\n* `ember-source-lens`\n  * [#11](https://github.com/ember-tooling/ember-source-lens/pull/11) Make content-tag a dependency ([@evoactivity](https://github.com/evoactivity))\n\n#### Committers: 1\n- Liam Potter ([@evoactivity](https://github.com/evoactivity))\n"
 }
