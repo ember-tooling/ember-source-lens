@@ -2,6 +2,17 @@
 
 ## Release (2025-12-05)
 
+* ember-source-lens 0.0.5 (patch)
+
+#### :bug: Bug Fix
+* `ember-source-lens`
+  * [#11](https://github.com/ember-tooling/ember-source-lens/pull/11) Make content-tag a dependency ([@evoactivity](https://github.com/evoactivity))
+
+#### Committers: 1
+- Liam Potter ([@evoactivity](https://github.com/evoactivity))
+
+## Release (2025-12-05)
+
 * ember-source-lens 0.0.4 (patch)
 
 #### :bug: Bug Fix
