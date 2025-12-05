@@ -196,6 +196,26 @@ describe('Adds data attributes to tags', () => {
       ]
     `);
   });
+
+  it('handles matching templates in same file', async () => {
+    const output = await transform(
+      './fixtures/multiple-matching-templates.gjs',
+      {
+        additionalRoots: ['tests/fixtures'],
+      },
+    );
+
+    expect(templateContentsOf(output)).toMatchInlineSnapshot(`
+      [
+        "<div data-source-file="/tests/fixtures/multiple-matching-templates.gjs" data-source-line="2" data-source-column="3" class="foo">
+        <h1 data-source-file="/tests/fixtures/multiple-matching-templates.gjs" data-source-line="3" data-source-column="5">Hello, World!</h1>
+      </div>",
+        "<div data-source-file="/tests/fixtures/multiple-matching-templates.gjs" data-source-line="8" data-source-column="3" class="foo">
+        <h1 data-source-file="/tests/fixtures/multiple-matching-templates.gjs" data-source-line="9" data-source-column="5">Hello, World!</h1>
+      </div>",
+      ]
+    `);
+  });
 });
 
 describe('removes SourceLens component and import in production', () => {

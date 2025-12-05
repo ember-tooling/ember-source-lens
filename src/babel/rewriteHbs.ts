@@ -1,23 +1,53 @@
 import recast, { type AST } from 'ember-template-recast';
 import fs from 'node:fs';
 import { fixFilename, combineRegexPatterns } from './utils.ts';
-import { Transformer } from 'content-tag-utils';
+import { Preprocessor, type Parsed } from 'content-tag';
+import {
+  getFileCoordinates,
+  type InnerCoordinates,
+} from './get-file-coordinates.ts';
 
-let fileCache = new Map<string, string>();
+const fileCache = new Map<string, string>();
+const fileModifiedTimes = new Map<string, number>();
 
 const invalidTagPatterns = [
   /^:/, // Don't process named blocks (:block-name)
 ];
-
 const isInvalidTag = combineRegexPatterns(invalidTagPatterns);
 
+const p = new Preprocessor();
+const parsedFiles = new Map<string, Parsed[]>();
+
+function isFileCacheValid(filename: string): boolean {
+  if (!fileCache.has(filename) || !fileModifiedTimes.has(filename)) {
+    return false;
+  }
+
+  const stats = fs.statSync(filename);
+  const cachedMtime = fileModifiedTimes.get(filename)!;
+  return stats.mtimeMs === cachedMtime;
+}
+
+function parseFile(filename: string, content: string): Parsed[] {
+  if (parsedFiles.has(filename) && isFileCacheValid(filename)) {
+    return parsedFiles.get(filename)!;
+  }
+  const parsed = p.parse(content);
+  parsedFiles.set(filename, parsed);
+  return parsed;
+}
+
 function getFullFileContent(filename: string): string {
-  if (fileCache.has(filename)) {
+  if (isFileCacheValid(filename)) {
     return fileCache.get(filename)!;
   }
 
   const content = fs.readFileSync(filename, 'utf-8');
+  const stats = fs.statSync(filename);
+
   fileCache.set(filename, content);
+  fileModifiedTimes.set(filename, stats.mtimeMs);
+
   return content;
 }
 
@@ -26,15 +56,15 @@ function getAllElementNodes(program: AST.Program): AST.ElementNode[] {
 
   recast.traverse(program, {
     ElementNode(node: AST.ElementNode) {
+      if (isInvalidTag(node.tag)) {
+        return;
+      }
       elementNodes.push(node);
     },
   });
 
   return elementNodes;
 }
-
-let programNodesForFile = new Map<string, AST.Program[]>();
-let processedElementsForFile = new Map<string, number>(); // Track processed elements per file
 
 export function templatePlugin(env: { filename: string }) {
   const isProduction =
@@ -57,24 +87,15 @@ export function templatePlugin(env: { filename: string }) {
   }
 
   const file = getFullFileContent(env.filename);
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-  const t = new Transformer(file);
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  const expectedProgramCount = t.parseResults.length as number;
-
+  const parsedFile = parseFile(env.filename, file);
+  const expectedProgramCount = parsedFile.length;
   const relativePath = fixFilename(env.filename);
+
+  let elementNodes: AST.ElementNode[] = [];
 
   return {
     Program(node: AST.Program) {
-      programNodesForFile.set(env.filename, [
-        ...(programNodesForFile.get(env.filename) || []),
-        node,
-      ]);
-
-      // Initialize element counter for this file if needed
-      if (!processedElementsForFile.has(env.filename)) {
-        processedElementsForFile.set(env.filename, 0);
-      }
+      elementNodes = getAllElementNodes(node);
     },
     ElementNode(node: AST.ElementNode) {
       if (expectedProgramCount === 0) {
@@ -85,34 +106,24 @@ export function templatePlugin(env: { filename: string }) {
         return;
       }
 
-      const innerCoordinates = {
+      const innerCoordinates: InnerCoordinates = {
         line: node.loc.startPosition.line,
         column: node.loc.startPosition.column,
         endColumn: node.loc.endPosition.column,
         endLine: node.loc.endPosition.line,
       };
 
-      let programNodeIndex = -1;
-
-      const programNodes = programNodesForFile.get(env.filename) || [];
-
-      programNodes.some((programNode, index) => {
-        const elementNodes = getAllElementNodes(programNode);
-
-        if (elementNodes.includes(node)) {
-          programNodeIndex = index;
-          return true;
-        }
-
-        return false;
+      const parsed = parsedFile.find((program: Parsed) => {
+        // @ts-expect-error data is accessible but marked private, node.loc.module returns 'an unknown module'
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        return program.contents === node.loc.data.source.source;
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-      const coords = t.reverseInnerCoordinatesOf(
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        t.parseResults[programNodeIndex],
-        innerCoordinates,
-      );
+      if (!parsed) {
+        return;
+      }
+
+      const coords = getFileCoordinates(file, parsed, innerCoordinates);
 
       node.attributes.push(
         recast.builders.attr(
@@ -121,35 +132,25 @@ export function templatePlugin(env: { filename: string }) {
         ),
         recast.builders.attr(
           'data-source-line',
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
           recast.builders.text(coords.line.toString()),
         ),
         recast.builders.attr(
           'data-source-column',
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
           recast.builders.text((coords.column + 1).toString()),
         ),
       );
 
-      // Increment processed element count
-      const processedCount =
-        (processedElementsForFile.get(env.filename) || 0) + 1;
-      processedElementsForFile.set(env.filename, processedCount);
+      // mark element as processed by removing it from the list
+      const index = elementNodes.indexOf(node);
+      if (index > -1) {
+        elementNodes.splice(index, 1);
+      }
 
-      // Count total elements across all programs
-      const totalElements = programNodes.reduce((sum, program) => {
-        return sum + getAllElementNodes(program).length;
-      }, 0);
-
-      // Check if we've reached the expected program count AND processed all elements
-      const currentProgramCount = programNodes.length;
-      if (
-        currentProgramCount === expectedProgramCount &&
-        processedCount === totalElements
-      ) {
-        programNodesForFile = new Map<string, AST.Program[]>();
-        processedElementsForFile = new Map<string, number>();
-        fileCache = new Map<string, string>();
+      // If all element nodes have been processed, clear the program contents
+      // so files with multiple matching templates find the correct index
+      if (elementNodes.length === 0) {
+        parsed.contents =
+          '___________ember-source-lens-cleared-content___________';
       }
     },
   };
