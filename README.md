@@ -18,7 +18,7 @@ Ember Source Lens is a powerful development tool that lets you navigate your Emb
 ## ✨ Features
 
 - **🎯 Precise Navigation** - Click any component to jump directly to its source file, line, and column
-- **⚡ IDE Integration** - Open the precise line in your editor.Supports VSCode, Cursor, WebStorm, Sublime Text, Windsurf, and more
+- **⚡ IDE Integration** - Open the precise line in your editor. Supports VSCode, WebStorm, Atom, Sublime Text, Cursor, and Windsurf.
 - **🔥 Inline Editing** - Edit components in the inline editor
 - **🎨 Visual Overlay** - Hover over elements to see highlighted component boundaries
 - **⌨️ Keyboard Shortcut** - Quick toggle with `Cmd+Shift+L` (or `Ctrl+Shift+L` on Windows/Linux)
@@ -128,7 +128,7 @@ export default defineConfig({
 
 ### Workflow
 
-1. **Activate Source Lens** - Press `Cmd+Shift+L` or click the toggle in your app
+1. **Activate Source Lens** - Press `Cmd+Shift+L` to enable the Source Lens panel
 2. **Enable Inspect Mode** - Click the 🔍 inspect button in the Source Lens panel
 3. **Hover Over Components** - Move your mouse over any component to see its source location
 4. **Click to Select** - Click on a component to select it and view details
