@@ -189,7 +189,9 @@ describe('Adds data attributes to tags', () => {
 
     expect(templateContentsOf(output)).toMatchInlineSnapshot(`
       [
-        "<Thing data-source-file="/tests/fixtures/yield-blocks.gjs" data-source-line="2" data-source-column="3">
+        "Hi
+      {{yield to="block1"}}",
+        "<Thing data-source-file="/tests/fixtures/yield-blocks.gjs" data-source-line="7" data-source-column="3">
         <:block1>
         </:block1>
       </Thing>",
