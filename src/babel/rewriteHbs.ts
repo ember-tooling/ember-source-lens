@@ -8,6 +8,7 @@ import {
 } from './get-file-coordinates.ts';
 
 const fileCache = new Map<string, string>();
+const fileModifiedTimes = new Map<string, number>();
 
 const invalidTagPatterns = [
   /^:/, // Don't process named blocks (:block-name)
@@ -17,8 +18,18 @@ const isInvalidTag = combineRegexPatterns(invalidTagPatterns);
 const p = new Preprocessor();
 const parsedFiles = new Map<string, Parsed[]>();
 
+function isFileCacheValid(filename: string): boolean {
+  if (!fileCache.has(filename) || !fileModifiedTimes.has(filename)) {
+    return false;
+  }
+
+  const stats = fs.statSync(filename);
+  const cachedMtime = fileModifiedTimes.get(filename)!;
+  return stats.mtimeMs === cachedMtime;
+}
+
 function parseFile(filename: string, content: string): Parsed[] {
-  if (parsedFiles.has(filename)) {
+  if (parsedFiles.has(filename) && isFileCacheValid(filename)) {
     return parsedFiles.get(filename)!;
   }
   const parsed = p.parse(content);
@@ -27,12 +38,16 @@ function parseFile(filename: string, content: string): Parsed[] {
 }
 
 function getFullFileContent(filename: string): string {
-  if (fileCache.has(filename)) {
+  if (isFileCacheValid(filename)) {
     return fileCache.get(filename)!;
   }
 
   const content = fs.readFileSync(filename, 'utf-8');
+  const stats = fs.statSync(filename);
+
   fileCache.set(filename, content);
+  fileModifiedTimes.set(filename, stats.mtimeMs);
+
   return content;
 }
 
@@ -99,7 +114,7 @@ export function templatePlugin(env: { filename: string }) {
       };
 
       const parsed = parsedFile.find((program: Parsed) => {
-        // @ts-expect-error data is accessible
+        // @ts-expect-error data is accessible but marked private, node.loc.module returns 'an unknown module'
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         return program.contents === node.loc.data.source.source;
       });
