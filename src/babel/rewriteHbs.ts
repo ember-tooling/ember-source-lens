@@ -1,15 +1,27 @@
 import recast, { type AST } from 'ember-template-recast';
 import fs from 'node:fs';
 import { fixFilename, combineRegexPatterns } from './utils.ts';
+import { Preprocessor, type Parsed } from 'content-tag';
 import { Transformer } from 'content-tag-utils';
 
-let fileCache = new Map<string, string>();
+const fileCache = new Map<string, string>();
 
 const invalidTagPatterns = [
   /^:/, // Don't process named blocks (:block-name)
 ];
-
 const isInvalidTag = combineRegexPatterns(invalidTagPatterns);
+
+const p = new Preprocessor();
+const parsedFiles = new Map<string, Parsed[]>();
+
+function parseFile(filename: string, content: string): Parsed[] {
+  if (parsedFiles.has(filename)) {
+    return parsedFiles.get(filename)!;
+  }
+  const parsed = p.parse(content);
+  parsedFiles.set(filename, parsed);
+  return parsed;
+}
 
 function getFullFileContent(filename: string): string {
   if (fileCache.has(filename)) {
@@ -26,15 +38,15 @@ function getAllElementNodes(program: AST.Program): AST.ElementNode[] {
 
   recast.traverse(program, {
     ElementNode(node: AST.ElementNode) {
+      if (isInvalidTag(node.tag)) {
+        return;
+      }
       elementNodes.push(node);
     },
   });
 
   return elementNodes;
 }
-
-let programNodesForFile = new Map<string, AST.Program[]>();
-let processedElementsForFile = new Map<string, number>(); // Track processed elements per file
 
 export function templatePlugin(env: { filename: string }) {
   const isProduction =
@@ -61,20 +73,14 @@ export function templatePlugin(env: { filename: string }) {
   const t = new Transformer(file);
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   const expectedProgramCount = t.parseResults.length as number;
-
+  const parsedFile = parseFile(env.filename, file);
   const relativePath = fixFilename(env.filename);
+
+  let elementNodes: AST.ElementNode[] = [];
 
   return {
     Program(node: AST.Program) {
-      programNodesForFile.set(env.filename, [
-        ...(programNodesForFile.get(env.filename) || []),
-        node,
-      ]);
-
-      // Initialize element counter for this file if needed
-      if (!processedElementsForFile.has(env.filename)) {
-        processedElementsForFile.set(env.filename, 0);
-      }
+      elementNodes = getAllElementNodes(node);
     },
     ElementNode(node: AST.ElementNode) {
       if (expectedProgramCount === 0) {
@@ -92,25 +98,20 @@ export function templatePlugin(env: { filename: string }) {
         endLine: node.loc.endPosition.line,
       };
 
-      let programNodeIndex = -1;
-
-      const programNodes = programNodesForFile.get(env.filename) || [];
-
-      programNodes.some((programNode, index) => {
-        const elementNodes = getAllElementNodes(programNode);
-
-        if (elementNodes.includes(node)) {
-          programNodeIndex = index;
-          return true;
-        }
-
-        return false;
+      const programIndex = parsedFile.findIndex((program: Parsed) => {
+        // @ts-expect-error data is accessible
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        return program.contents === node.loc.data.source.source;
       });
+
+      if (programIndex === -1) {
+        return;
+      }
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       const coords = t.reverseInnerCoordinatesOf(
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        t.parseResults[programNodeIndex],
+        t.parseResults[programIndex],
         innerCoordinates,
       );
 
@@ -131,25 +132,20 @@ export function templatePlugin(env: { filename: string }) {
         ),
       );
 
-      // Increment processed element count
-      const processedCount =
-        (processedElementsForFile.get(env.filename) || 0) + 1;
-      processedElementsForFile.set(env.filename, processedCount);
+      // mark element as processed by removing it from the list
+      const index = elementNodes.indexOf(node);
+      if (index > -1) {
+        elementNodes.splice(index, 1);
+      }
 
-      // Count total elements across all programs
-      const totalElements = programNodes.reduce((sum, program) => {
-        return sum + getAllElementNodes(program).length;
-      }, 0);
-
-      // Check if we've reached the expected program count AND processed all elements
-      const currentProgramCount = programNodes.length;
-      if (
-        currentProgramCount === expectedProgramCount &&
-        processedCount === totalElements
-      ) {
-        programNodesForFile = new Map<string, AST.Program[]>();
-        processedElementsForFile = new Map<string, number>();
-        fileCache = new Map<string, string>();
+      // If all element nodes have been processed, clear the program contents
+      // so files with multiple matching templates find the correct index
+      if (elementNodes.length === 0) {
+        const index = programIndex;
+        if (index > -1) {
+          parsedFile[index]!.contents =
+            '___________ember-source-lens-cleared-content___________';
+        }
       }
     },
   };
