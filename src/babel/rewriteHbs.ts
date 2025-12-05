@@ -1,9 +1,15 @@
 import recast, { type AST } from 'ember-template-recast';
 import fs from 'node:fs';
-import { fixFilename } from './utils.ts';
+import { fixFilename, combineRegexPatterns } from './utils.ts';
 import { Transformer } from 'content-tag-utils';
 
 let fileCache = new Map<string, string>();
+
+const invalidTagPatterns = [
+  /^:/, // Don't process named blocks (:block-name)
+];
+
+const isInvalidTag = combineRegexPatterns(invalidTagPatterns);
 
 function getFullFileContent(filename: string): string {
   if (fileCache.has(filename)) {
@@ -72,6 +78,10 @@ export function templatePlugin(env: { filename: string }) {
     },
     ElementNode(node: AST.ElementNode) {
       if (expectedProgramCount === 0) {
+        return;
+      }
+
+      if (isInvalidTag(node.tag)) {
         return;
       }
 
