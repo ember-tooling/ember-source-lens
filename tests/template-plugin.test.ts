@@ -181,6 +181,21 @@ describe('Adds data attributes to tags', () => {
 
     expect(templateContentsOf(output)).toMatchSnapshot();
   });
+
+  it('handles yield blocks', async () => {
+    const output = await transform('./fixtures/yield-blocks.gjs', {
+      additionalRoots: ['tests/fixtures'],
+    });
+
+    expect(templateContentsOf(output)).toMatchInlineSnapshot(`
+      [
+        "<Thing data-source-file="/tests/fixtures/yield-blocks.gjs" data-source-line="2" data-source-column="3">
+        <:block1>
+        </:block1>
+      </Thing>",
+      ]
+    `);
+  });
 });
 
 describe('removes SourceLens component and import in production', () => {

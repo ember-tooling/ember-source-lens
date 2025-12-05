@@ -165,3 +165,38 @@ export function fixFilename(filename: string): string {
 
   return fileName.replace(workspace, '');
 }
+
+/**
+ * Combines multiple regex patterns into a single regex that tests if ANY of them match.
+ * Uses the OR operator (|) to join patterns.
+ *
+ * @param patterns - Array of RegExp objects to combine
+ * @returns A function that tests if the input string matches any of the patterns
+ *
+ * @example
+ * const isValid = combineRegexPatterns([
+ *   /^[a-zA-Z]/, // starts with letter
+ *   /^@/,        // starts with @
+ * ]);
+ * isValid('Hello') // true
+ * isValid('@component') // true
+ * isValid('123') // false
+ */
+export function combineRegexPatterns(
+  patterns: RegExp[],
+): (input: string) => boolean {
+  if (patterns.length === 0) {
+    return () => false;
+  }
+
+  if (patterns.length === 1) {
+    return (input: string) => patterns[0]!.test(input);
+  }
+
+  // Extract source patterns and combine with OR
+  const combinedPattern = patterns.map((regex) => regex.source).join('|');
+
+  const combinedRegex = new RegExp(combinedPattern);
+
+  return (input: string) => combinedRegex.test(input);
+}
