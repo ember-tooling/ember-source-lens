@@ -1,6 +1,6 @@
 import type { PluginObj } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
-import * as t from '@babel/types';
+import type * as t from '@babel/types';
 import * as templatePlugin from './template-plugin.ts';
 
 export function sourceLens(): PluginObj {
