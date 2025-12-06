@@ -1,7 +1,7 @@
 import path from 'node:path';
 import fs from 'node:fs';
 
-import { type ViteDevServer, type Plugin } from 'vite';
+import type { ViteDevServer, Plugin } from 'vite';
 import type { ViteHotContext } from 'vite/types/hot.js';
 
 function sanitizeFilePath(filePath: string): string {

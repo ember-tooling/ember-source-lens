@@ -1,7 +1,7 @@
 import type { PluginObj } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
-import * as t from '@babel/types';
-import * as templatePlugin from './template-plugin.ts';
+import type * as t from '@babel/types';
+import { createPlugin } from './template-plugin.ts';
 
 export function sourceLens(): PluginObj {
   const isProduction =
@@ -30,4 +30,4 @@ export function sourceLens(): PluginObj {
   };
 }
 
-sourceLens.template = templatePlugin.createPlugin;
+sourceLens.template = createPlugin;
