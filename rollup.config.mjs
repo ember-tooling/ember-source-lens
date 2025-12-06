@@ -4,6 +4,8 @@ import { fileURLToPath } from 'node:url';
 import { resolve, dirname } from 'node:path';
 import postcss from 'rollup-plugin-postcss';
 import typescript from '@rollup/plugin-typescript';
+import { minify } from 'rollup-plugin-esbuild-minify';
+import copy from 'rollup-plugin-copy';
 
 const addon = new Addon({
   srcDir: 'src',
@@ -19,6 +21,8 @@ export default [
     // This provides defaults that work well alongside `publicEntrypoints` below.
     // You can augment this if you need to.
     output: addon.output(),
+
+    external: ['node:fs', 'node:path', 'node:assert', 'node:process'],
 
     plugins: [
       postcss({
@@ -39,11 +43,7 @@ export default [
       // up your addon's public API. Also make sure your package.json#exports
       // is aligned to the config here.
       // See https://github.com/embroider-build/embroider/blob/main/docs/v2-faq.md#how-can-i-define-the-public-exports-of-my-addon
-      addon.publicEntrypoints([
-        'components/*.js',
-        'index.js',
-        'template-registry.js',
-      ]),
+      addon.publicEntrypoints(['**/*.js', 'index.js']),
 
       // Follow the V2 Addon rules about dependencies. Your code can import from
       // `dependencies` and `peerDependencies` as well as standard Ember-provided
@@ -78,17 +78,29 @@ export default [
   {
     input: 'src/babel/plugin.ts',
     output: {
-      dir: 'dist/babel',
+      file: 'dist/babel/plugin.cjs',
       format: 'cjs',
     },
-    plugins: [typescript()],
-  },
-  {
-    input: 'src/vite-plugin.ts',
-    output: {
-      dir: 'dist',
-      format: 'es',
-    },
-    plugins: [typescript()],
+    external: [
+      'content-tag',
+      'ember-template-recast',
+      'node:fs',
+      'node:path',
+      'node:assert',
+      'node:process',
+    ],
+    plugins: [
+      typescript(),
+      minify(),
+      copy({
+        targets: [
+          {
+            src: 'declarations/babel/plugin.d.ts',
+            dest: 'declarations/babel/',
+            rename: 'plugin.d.cts',
+          },
+        ],
+      }),
+    ],
   },
 ];
