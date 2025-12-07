@@ -1,5 +1,16 @@
 # Changelog
 
+## Release (2025-12-07)
+
+* ember-source-lens 0.0.7 (patch)
+
+#### :bug: Bug Fix
+* `ember-source-lens`
+  * [#17](https://github.com/ember-tooling/ember-source-lens/pull/17) Separate builds for ember components (esm), vite plugin (esm) and babel plugin (cjs) ([@evoactivity](https://github.com/evoactivity))
+
+#### Committers: 1
+- Liam Potter ([@evoactivity](https://github.com/evoactivity))
+
 ## Release (2025-12-05)
 
 * ember-source-lens 0.0.6 (patch)
