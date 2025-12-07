@@ -2,6 +2,17 @@
 
 ## Release (2025-12-07)
 
+* ember-source-lens 0.0.8 (patch)
+
+#### :bug: Bug Fix
+* `ember-source-lens`
+  * [#18](https://github.com/ember-tooling/ember-source-lens/pull/18) Check for existing padding and add our padding to it ([@evoactivity](https://github.com/evoactivity))
+
+#### Committers: 1
+- Liam Potter ([@evoactivity](https://github.com/evoactivity))
+
+## Release (2025-12-07)
+
 * ember-source-lens 0.0.7 (patch)
 
 #### :bug: Bug Fix

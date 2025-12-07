@@ -2,8 +2,8 @@
   "solution": {
     "ember-source-lens": {
       "impact": "patch",
-      "oldVersion": "0.0.6",
-      "newVersion": "0.0.7",
+      "oldVersion": "0.0.7",
+      "newVersion": "0.0.8",
       "tagName": "latest",
       "constraints": [
         {
@@ -14,5 +14,5 @@
       "pkgJSONPath": "./package.json"
     }
   },
-  "description": "## Release (2025-12-07)\n\n* ember-source-lens 0.0.7 (patch)\n\n#### :bug: Bug Fix\n* `ember-source-lens`\n  * [#17](https://github.com/ember-tooling/ember-source-lens/pull/17) Separate builds for ember components (esm), vite plugin (esm) and babel plugin (cjs) ([@evoactivity](https://github.com/evoactivity))\n\n#### Committers: 1\n- Liam Potter ([@evoactivity](https://github.com/evoactivity))\n"
+  "description": "## Release (2025-12-07)\n\n* ember-source-lens 0.0.8 (patch)\n\n#### :bug: Bug Fix\n* `ember-source-lens`\n  * [#18](https://github.com/ember-tooling/ember-source-lens/pull/18) Check for existing padding and add our padding to it ([@evoactivity](https://github.com/evoactivity))\n\n#### Committers: 1\n- Liam Potter ([@evoactivity](https://github.com/evoactivity))\n"
 }
