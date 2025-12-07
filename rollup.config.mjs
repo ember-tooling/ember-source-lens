@@ -4,7 +4,8 @@ import { fileURLToPath } from 'node:url';
 import { resolve, dirname } from 'node:path';
 import postcss from 'rollup-plugin-postcss';
 import typescript from '@rollup/plugin-typescript';
-import { minify } from 'rollup-plugin-esbuild-minify';
+import mv from 'rollup-plugin-mv';
+import del from 'rollup-plugin-delete';
 import copy from 'rollup-plugin-copy';
 
 const addon = new Addon({
@@ -15,6 +16,78 @@ const addon = new Addon({
 const rootDirectory = dirname(fileURLToPath(import.meta.url));
 const babelConfig = resolve(rootDirectory, './babel.publish.config.cjs');
 const tsConfig = resolve(rootDirectory, './tsconfig.publish.json');
+
+function babelPlugin(output = 'es') {
+  return {
+    input: 'src/babel/plugin.ts',
+    output:
+      output === 'cjs'
+        ? {
+            file: 'dist/babel/plugin.cjs',
+            format: 'cjs',
+          }
+        : {
+            file: 'dist/babel/plugin.js',
+            format: 'es',
+          },
+    external: [
+      'content-tag',
+      'ember-template-recast',
+      'node:fs',
+      'node:path',
+      'node:assert',
+      'node:process',
+    ],
+    plugins: [
+      typescript({
+        include: ['src/babel/**/*'],
+        exclude: null,
+        compilerOptions: {
+          outDir: 'dist',
+          declaration: output === 'cjs' ? false : true,
+          declarationDir: output === 'cjs' ? null : 'dist/babel',
+          declarationMap: output === 'cjs' ? false : true,
+          allowImportingTsExtensions: true,
+          rewriteRelativeImportExtensions: true,
+        },
+      }),
+      output === 'es'
+        ? mv(
+            [
+              {
+                src: 'dist/babel/src/babel',
+                dest: `declarations/babel`,
+              },
+            ],
+            { overwrite: true },
+          )
+        : null,
+      output === 'es'
+        ? del({
+            targets: 'dist/babel/src',
+            hook: 'closeBundle',
+            force: true,
+          })
+        : null,
+      output === 'cjs'
+        ? copy({
+            targets: [
+              {
+                src: 'declarations/babel/*',
+                dest: 'declarations/babel',
+                rename: (name, extension) => {
+                  if (extension === 'map') {
+                    return `${name.replace(/\.d\.ts/, '.d.cts')}.${extension}`;
+                  }
+                  return `${name}.cts`;
+                },
+              },
+            ],
+          })
+        : null,
+    ],
+  };
+}
 
 export default [
   {
@@ -43,7 +116,7 @@ export default [
       // up your addon's public API. Also make sure your package.json#exports
       // is aligned to the config here.
       // See https://github.com/embroider-build/embroider/blob/main/docs/v2-faq.md#how-can-i-define-the-public-exports-of-my-addon
-      addon.publicEntrypoints(['**/*.js', 'index.js']),
+      addon.publicEntrypoints(['components/SourceLens.js', 'index.js']),
 
       // Follow the V2 Addon rules about dependencies. Your code can import from
       // `dependencies` and `peerDependencies` as well as standard Ember-provided
@@ -75,32 +148,42 @@ export default [
       addon.clean(),
     ],
   },
+  babelPlugin(),
+  babelPlugin('cjs'),
   {
-    input: 'src/babel/plugin.ts',
+    input: 'src/vite-plugin.ts',
     output: {
-      file: 'dist/babel/plugin.cjs',
-      format: 'cjs',
+      file: 'dist/vite-plugin.js',
+      format: 'es',
     },
-    external: [
-      'content-tag',
-      'ember-template-recast',
-      'node:fs',
-      'node:path',
-      'node:assert',
-      'node:process',
-    ],
+    external: ['node:path', 'node:fs'],
     plugins: [
-      typescript(),
-      minify(),
-      copy({
-        targets: [
+      typescript({
+        include: ['src/vite-plugin.ts'],
+        exclude: null,
+        compilerOptions: {
+          outDir: 'dist',
+          declaration: true,
+          declarationDir: 'dist',
+          declarationMap: true,
+          allowImportingTsExtensions: true,
+          rewriteRelativeImportExtensions: true,
+        },
+      }),
+      mv(
+        [
           {
-            src: 'declarations/babel/plugin.d.ts',
-            dest: 'declarations/babel/',
-            rename: 'plugin.d.cts',
+            src: 'dist/src/vite-plugin.d.ts',
+            dest: 'declarations/vite-plugin.d.ts',
+          },
+          {
+            src: 'dist/src/vite-plugin.d.ts.map',
+            dest: 'declarations/vite-plugin.d.ts.map',
           },
         ],
-      }),
+        { overwrite: true },
+      ),
+      del({ targets: 'dist/src', hook: 'closeBundle', force: true }),
     ],
   },
 ];
