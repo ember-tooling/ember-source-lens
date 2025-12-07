@@ -1,5 +1,8 @@
-html:has(.panel) {
-  padding-bottom: 40px; /* Make space for the source lens panel */
+html[class*="_esl_active_"]:has(.panel) {
+  --_esl-existing-padding: var(--esl-existing-padding, 0);
+  padding-bottom: calc(
+    var(--_esl-existing-padding) + 40px
+  ); /* Make space for the source lens panel */
 }
 
 .source-lens {

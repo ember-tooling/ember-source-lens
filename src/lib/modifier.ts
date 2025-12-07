@@ -42,6 +42,8 @@ export function clearSourceLensDataAttributes(): void {
   });
 }
 
+const HTML_CLASS = '_esl_active_';
+
 export const sourceLensModifier = modifier(
   (
     _element: HTMLElement,
@@ -57,6 +59,16 @@ export const sourceLensModifier = modifier(
     if (!sourceLensState) {
       return;
     }
+
+    const existingPadding = getComputedStyle(
+      document.documentElement,
+    ).getPropertyValue('padding-bottom');
+    document.documentElement.style.setProperty(
+      '--esl-existing-padding',
+      existingPadding,
+    );
+
+    document.documentElement.classList.add(HTML_CLASS);
 
     const abortController = new AbortController();
     const { signal } = abortController;
@@ -162,6 +174,7 @@ export const sourceLensModifier = modifier(
     return () => {
       abortController.abort();
       observer.disconnect();
+      document.documentElement.classList.remove(HTML_CLASS);
     };
   },
 );
