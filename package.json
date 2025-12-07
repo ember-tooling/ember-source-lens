@@ -1,0 +1,145 @@
+{
+  "name": "ember-source-lens",
+  "version": "0.0.8",
+  "description": "Ember Source Lens is a developer tool that allows you to click on rendered Ember components in the browser and jump directly to their source code in your editor.",
+  "keywords": [
+    "ember-addon"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:ember-tooling/ember-source-lens.git"
+  },
+  "license": "MIT",
+  "author": "Liam Potter",
+  "type": "module",
+  "imports": {
+    "#src/*": "./src/*"
+  },
+  "exports": {
+    ".": {
+      "types": "./declarations/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./babel": {
+      "import": {
+        "types": "./declarations/babel/plugin.d.ts",
+        "default": "./dist/babel/plugin.js"
+      },
+      "require": {
+        "types": "./declarations/babel/plugin.d.cts",
+        "default": "./dist/babel/plugin.cjs"
+      }
+    },
+    "./vite": {
+      "types": "./declarations/vite-plugin.d.ts",
+      "default": "./dist/vite-plugin.js"
+    },
+    "./addon-main.js": "./addon-main.cjs"
+  },
+  "files": [
+    "addon-main.cjs",
+    "declarations",
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "rollup --config",
+    "dev": "pnpm start",
+    "format": "prettier . --cache --write",
+    "lint": "concurrently \"pnpm:lint:*(!fix)\" --names \"lint:\" --prefixColors auto",
+    "lint:fix": "concurrently \"pnpm:lint:*:fix\" --names \"fix:\" --prefixColors auto && pnpm run format",
+    "lint:format": "prettier . --cache --check",
+    "lint:hbs": "ember-template-lint . --no-error-on-unmatched-pattern",
+    "lint:hbs:fix": "ember-template-lint . --fix --no-error-on-unmatched-pattern",
+    "lint:js": "eslint . --cache",
+    "lint:js:fix": "eslint . --fix",
+    "lint:types": "ember-tsc --noEmit",
+    "start": "pnpm prepack && vite dev",
+    "test": "pnpm prepack && vitest",
+    "test:app": "pnpm prepack && vite build --mode=development --out-dir dist-tests && testem --file testem.cjs ci --port 0",
+    "test:ui": "pnpm prepack && vitest --ui"
+  },
+  "dependencies": {
+    "@embroider/addon-shim": "^1.8.9",
+    "content-tag": "^4.0.0",
+    "decorator-transforms": "^2.2.2",
+    "ember-local-storage-decorator": "github:evoactivity/ember-local-storage-decorator#dist",
+    "ember-modifier": "^4.2.2",
+    "ember-primitives": "^0.45.1",
+    "ember-template-recast": "^6.1.5",
+    "modern-monaco": "^0.3.3"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.2",
+    "@babel/core": "^7.25.2",
+    "@babel/eslint-parser": "^7.25.1",
+    "@babel/plugin-transform-typescript": "^7.25.2",
+    "@babel/runtime": "^7.25.6",
+    "@babel/traverse": "^7.28.5",
+    "@babel/types": "^7.28.5",
+    "@ember/app-tsconfig": "^1.0.0",
+    "@ember/library-tsconfig": "^1.0.0",
+    "@ember/test-helpers": "^5.2.1",
+    "@ember/test-waiters": "^4.1.1",
+    "@embroider/addon-dev": "^8.1.0",
+    "@embroider/compat": "^4.1.0",
+    "@embroider/core": "^4.1.0",
+    "@embroider/macros": "^1.18.0",
+    "@embroider/vite": "^1.1.5",
+    "@eslint/js": "^9.17.0",
+    "@glimmer/component": "^2.0.0",
+    "@glimmer/syntax": "^0.95.0",
+    "@glint/ember-tsc": "^1.0.3",
+    "@glint/template": "^1.6.1",
+    "@glint/tsserver-plugin": "^2.0.0",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-typescript": "^12.3.0",
+    "@types/babel__core": "^7.20.5",
+    "@types/babel__traverse": "^7.28.0",
+    "@types/common-tags": "^1.8.4",
+    "@types/jscodeshift": "^17.3.0",
+    "@types/node": "^24.10.1",
+    "@types/qunit": "^2.19.12",
+    "@vitest/ui": "4.0.8",
+    "babel-plugin-ember-template-compilation": "^2.2.5",
+    "common-tags": "^1.8.2",
+    "concurrently": "^9.0.1",
+    "ember-qunit": "^9.0.2",
+    "ember-source": "^6.7.0",
+    "ember-strict-application-resolver": "^0.1.0",
+    "ember-template-lint": "^7.9.0",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-ember": "^12.7.4",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-n": "^17.15.1",
+    "globals": "^16.1.0",
+    "jscodeshift": "^17.3.0",
+    "postcss": "^8.5.6",
+    "prettier": "^3.4.2",
+    "prettier-plugin-ember-template-tag": "^2.0.4",
+    "qunit": "^2.24.1",
+    "qunit-dom": "^3.4.0",
+    "release-plan": "^0.17.0",
+    "rollup": "^4.22.5",
+    "rollup-plugin-copy": "^3.5.0",
+    "rollup-plugin-delete": "^3.0.1",
+    "rollup-plugin-mv": "^0.0.2",
+    "rollup-plugin-postcss": "^4.0.2",
+    "testem": "^3.15.1",
+    "typescript": "~5.8.3",
+    "typescript-eslint": "^8.19.1",
+    "vite": "^7.1.9",
+    "vite-css-modules": "^1.11.1",
+    "vitest": "^4.0.8"
+  },
+  "packageManager": "pnpm@10.20.0",
+  "ember": {
+    "edition": "octane"
+  },
+  "ember-addon": {
+    "version": 2,
+    "type": "addon",
+    "main": "addon-main.cjs"
+  }
+}
